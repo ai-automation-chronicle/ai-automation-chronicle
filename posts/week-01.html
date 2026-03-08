@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Week 01 · AI & Automation Chronicle</title>
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="../index.html" class="nav-brand">AI & <span>Automation</span> Chronicle</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- POST HEADER -->
+  <div class="post-header">
+    <div class="post-week">Week 01 · March 2026</div>
+    <h1>Attention Is All You Need: Revisited</h1>
+    <div class="post-date">Published March 8, 2026 · by Satish K C</div>
+  </div>
+
+  <!-- POST BODY -->
+  <div class="post-body">
+
+    <h2>The Paper</h2>
+    <p>
+      The paper is called <strong>"Attention Is All You Need"</strong>. It was written by a group of researchers
+      at Google in 2017. Their names are Vaswani, Shazeer, Parmar, and others. This paper is one of the most
+      important papers ever written in the field of AI. It introduced a new way to build AI models called
+      the <strong>Transformer</strong>.
+    </p>
+    <p>
+      Before this paper, almost everyone building AI for language used older methods. After this paper,
+      everything changed. If you have ever used ChatGPT, Claude, or Google Translate, you have used
+      something built on top of this paper.
+    </p>
+    <a href="https://arxiv.org/abs/1706.03762" target="_blank" class="paper-link">
+      Read the Paper →
+    </a>
+
+    <h2>What Was the Problem Before This Paper?</h2>
+    <p>
+      Let's say you want to teach a computer to read and understand sentences. How do you do that?
+    </p>
+    <p>
+      Before 2017, the most popular way was to use models called <strong>RNNs</strong> (Recurrent Neural Networks)
+      and <strong>LSTMs</strong> (Long Short-Term Memory networks). These models read a sentence one word at a time,
+      from left to right. They tried to remember what they had read before as they moved forward.
+    </p>
+    <p>
+      Think of it like reading a book but you can only look at one word at a time, and you have to try
+      to remember everything you read before. By the time you get to the end of a long sentence,
+      you have already forgotten what was at the beginning.
+    </p>
+    <p>
+      This caused two big problems:
+    </p>
+    <ul>
+      <li><strong>It was slow.</strong> You had to wait for each word to be processed before moving to the next one. You could not do many things at the same time.</li>
+      <li><strong>It forgot things.</strong> When sentences were long, the model struggled to connect words that were far apart from each other.</li>
+    </ul>
+    <p>
+      The researchers who wrote this paper asked a simple but powerful question: what if we did not read
+      one word at a time at all? What if every word could look at every other word at the same time?
+    </p>
+
+    <h2>What Did They Come Up With?</h2>
+    <p>
+      Their answer was something called <strong>self-attention</strong>. The idea is straightforward.
+      When the model reads a sentence, instead of going word by word, every single word gets to look
+      at all the other words at once and decide which ones are most important to it.
+    </p>
+    <p>
+      Here is a simple example. Take the sentence: <em>"The dog did not cross the street because it was tired."</em>
+      What does the word "it" refer to? It refers to "the dog", not "the street". A human knows this easily.
+      But for a computer, this is genuinely hard, especially if it can only read one word at a time.
+    </p>
+    <p>
+      With self-attention, the word "it" can directly look at all other words in the sentence and figure out
+      that "dog" is the most relevant one. It does not have to wait. It does not have to remember.
+      It just looks at everything at once.
+    </p>
+    <p>
+      They also added something called <strong>multi-head attention</strong>. This means the model does not
+      just look at words in one way. It looks at them in many different ways at the same time. One "head"
+      might focus on grammar. Another might focus on meaning. Another might focus on tone. All of this
+      happens at the same time, in parallel.
+    </p>
+    <p>
+      Finally, they added <strong>positional encodings</strong>. Since the model reads all words at once,
+      it needs a way to know the order of the words. Positional encodings are small signals added to each
+      word that tell the model: "this word is first", "this word is second", and so on.
+    </p>
+
+    <h2>Key Findings</h2>
+    <ul>
+      <li>Every word can look at every other word at the same time. No waiting, no forgetting.</li>
+      <li>Multi-head attention lets the model learn many different things about words all at once.</li>
+      <li>Positional encodings give the model a sense of word order without needing to go step by step.</li>
+      <li>The whole model can run in parallel on a GPU, which makes training much faster.</li>
+      <li>It beat the best existing models on language translation tasks, and it did so faster and with less computing power.</li>
+      <li>The design is clean and simple. No complicated memory tricks, no step-by-step reading.</li>
+    </ul>
+
+    <h2>How Well Did It Work?</h2>
+    <p>
+      The researchers tested their model on two big translation tasks: English to German and English to French.
+      Their Transformer model did better than all the older models on both tasks. And it trained in a fraction
+      of the time. One version took only 12 hours to train on 8 GPUs. The older models took days.
+    </p>
+    <p>
+      This was a huge deal. Better results, faster training, simpler design. It was hard to argue against it.
+    </p>
+
+    <h2>Why Does This Matter for AI and Automation?</h2>
+    <p>
+      This paper is the foundation of almost every powerful AI model you hear about today.
+    </p>
+    <ul>
+      <li><strong>GPT-4</strong> (the model behind ChatGPT) is built on Transformers.</li>
+      <li><strong>Claude</strong> (the AI you might be talking to right now) is built on Transformers.</li>
+      <li><strong>Gemini</strong> (Google's AI) is built on Transformers.</li>
+      <li><strong>BERT</strong> (used in Google Search) is built on Transformers.</li>
+      <li><strong>Llama</strong> (Meta's open-source AI) is built on Transformers.</li>
+    </ul>
+    <p>
+      If you work in AI, data science, or automation, you will run into Transformers everywhere.
+      Document processing, chatbots, code generation, data extraction, summarization. All of it
+      is powered by the same core idea from this 2017 paper.
+    </p>
+    <p>
+      Understanding how Transformers work is not just academic. It helps you make better decisions
+      when building AI systems. You will know why certain models are good at certain tasks,
+      why longer inputs cost more to process, and why fine-tuning works the way it does.
+    </p>
+
+    <h2>My Take</h2>
+    <p>
+      What I find most interesting about this paper is how simple the core idea really is.
+      The researchers did not invent a complex new type of memory. They did not add more layers
+      of complicated logic. They just said: let everything talk to everything else at once.
+      That's it.
+    </p>
+    <p>
+      The title of the paper, "Attention Is All You Need", is almost a bold statement.
+      They are saying: you do not need the old complicated methods. Just use attention.
+      And they were right.
+    </p>
+    <p>
+      It is a good reminder that the best solutions are often not the most complicated ones.
+      Sometimes a clean, simple idea beats years of incremental improvements on old methods.
+    </p>
+    <p>
+      The fact that this paper from 2017 still sits at the core of the most advanced AI systems
+      in 2026 says everything about how big this idea was.
+    </p>
+
+    <p>
+      <strong>Discussion question:</strong> With new architectures like Mamba, MoE models, and State Space Models
+      gaining ground, do you think the pure Transformer will still be the dominant architecture in 5 years?
+      Or is something better already on its way? Share your thoughts below.
+    </p>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 AI & Automation Chronicle · Built by <a href="https://github.com/satishkc7" target="_blank">Satish K C</a></p>
+  </footer>
+
+</body>
+</html>
