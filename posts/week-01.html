@@ -3,11 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Week 01 · AI & Automation Chronicle</title>
+  <meta name="description" content="A deep dive into 'Attention Is All You Need' — the 2017 Transformer paper that changed AI forever."/>
+  <meta property="og:title" content="Attention Is All You Need: Revisited · AI & Automation Chronicle"/>
+  <meta property="og:description" content="A deep dive into the original Transformer paper and why it still shapes every modern LLM architecture today."/>
+  <meta property="og:type" content="article"/>
+  <title>Week 01 · Attention Is All You Need · AI & Automation Chronicle</title>
   <link rel="stylesheet" href="../assets/css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 </head>
 <body>
+
+  <!-- READING PROGRESS BAR -->
+  <div id="progress-bar"></div>
 
   <!-- NAVBAR -->
   <nav>
@@ -18,11 +25,30 @@
     </ul>
   </nav>
 
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <div class="breadcrumb-inner">
+      <a href="../index.html">Home</a>
+      <span class="breadcrumb-sep">&#8250;</span>
+      <span class="breadcrumb-current">Week 01 &middot; Attention Is All You Need</span>
+    </div>
+  </div>
+
   <!-- POST HEADER -->
   <div class="post-header">
-    <div class="post-week">Week 01 · March 2026</div>
-    <h1>Attention Is All You Need: Revisited</h1>
-    <div class="post-date">Published March 8, 2026 · by Satish K C</div>
+    <div class="post-header-inner">
+      <span class="post-week">Week 01 &middot; March 2026</span>
+      <h1>Attention Is All You Need: Revisited</h1>
+      <div class="post-header-meta">
+        <span>March 8, 2026 &middot; by Satish K C</span>
+        <span>8 min read</span>
+      </div>
+      <div class="post-header-tags">
+        <span class="tag">Deep Learning</span>
+        <span class="tag green">Transformers</span>
+        <span class="tag purple">NLP</span>
+      </div>
+    </div>
   </div>
 
   <!-- POST BODY -->
@@ -40,8 +66,8 @@
       everything changed. If you have ever used ChatGPT, Claude, or Google Translate, you have used
       something built on top of this paper.
     </p>
-    <a href="https://arxiv.org/abs/1706.03762" target="_blank" class="paper-link">
-      Read the Paper →
+    <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener" class="paper-link">
+      Read the Paper &#8594;
     </a>
 
     <h2>What Was the Problem Before This Paper?</h2>
@@ -169,10 +195,54 @@
 
   </div>
 
+  <!-- SHARE SECTION -->
+  <div class="share-section">
+    <h3>Share this discussion</h3>
+    <div class="share-buttons">
+      <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fsatishkc7.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-01.html&title=Attention%20Is%20All%20You%20Need%3A%20Revisited"
+         target="_blank" rel="noopener" class="share-btn linkedin">
+        LinkedIn
+      </a>
+      <a href="https://twitter.com/intent/tweet?text=Week%2001%3A%20Attention%20Is%20All%20You%20Need%20%E2%80%94%20Revisited&url=https%3A%2F%2Fsatishkc7.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-01.html"
+         target="_blank" rel="noopener" class="share-btn twitter">
+        X / Twitter
+      </a>
+      <button class="share-btn copy" id="copy-btn" onclick="
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          this.textContent = 'Copied!';
+          setTimeout(() => { this.textContent = 'Copy Link'; }, 2000);
+        });
+      ">
+        Copy Link
+      </button>
+    </div>
+  </div>
+
+  <!-- POST NAVIGATION -->
+  <div class="post-nav">
+    <a href="../index.html">&#8592; Back to all papers</a>
+  </div>
+
   <!-- FOOTER -->
   <footer>
-    <p>© 2026 AI & Automation Chronicle · Built by <a href="https://github.com/satishkc7" target="_blank">Satish K C</a></p>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <a href="../about.html">About</a>
+      <a href="https://github.com/satishkc7" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://linkedin.com/in/satishkc7" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <p>&copy; 2026 AI &amp; Automation Chronicle &middot; Built by <a href="https://github.com/satishkc7" target="_blank" rel="noopener">Satish K C</a></p>
   </footer>
+
+  <!-- READING PROGRESS SCRIPT -->
+  <script>
+    const bar = document.getElementById('progress-bar');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = docHeight > 0 ? (scrollTop / docHeight * 100) + '%' : '0%';
+    });
+  </script>
 
 </body>
 </html>
