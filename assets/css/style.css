@@ -86,10 +86,9 @@ nav {
 
 .nav-brand {
   color: var(--text-dark);
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 700;
   text-decoration: none;
-  font-family: Georgia, serif;
   letter-spacing: -0.01em;
 }
 
