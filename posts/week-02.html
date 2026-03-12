@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Is Monday.com the new Excel? A deep dive into how Monday.com's AI layer is transforming project management into a thinking Work OS."/>
+  <meta property="og:title" content="Is Monday.com the New Excel? · AI & Automation Chronicle"/>
+  <meta property="og:description" content="Monday.com is quietly evolving from a project tracker into an AI-powered Work OS. Here's what's really happening under the hood."/>
+  <meta property="og:type" content="article"/>
+  <title>Week 02 · Is Monday.com the New Excel? · AI & Automation Chronicle</title>
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── Diagram base ── */
+    .diagram-wrap {
+      margin: 2.5rem 0;
+      background: #0f1117;
+      border: 1px solid #1e2230;
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      overflow-x: auto;
+    }
+    .diagram-wrap .diagram-title {
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+    }
+    .diagram-wrap svg {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+    }
+
+    /* ── Comparison table ── */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    @media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }
+    .compare-col {
+      border-radius: 14px;
+      padding: 1.4rem 1.2rem;
+    }
+    .compare-col.old {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+    }
+    .compare-col.new {
+      background: #0b1e2d;
+      border: 1px solid #1a3a5c;
+    }
+    .compare-col h4 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.9rem;
+    }
+    .compare-col.old h4 { color: #6b7280; }
+    .compare-col.new h4 { color: #38bdf8; }
+    .compare-col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .compare-col ul li {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .compare-col ul li:last-child { border-bottom: none; }
+    .compare-col.old ul li::before { content: "✕"; color: #ef4444; font-size: 0.75rem; margin-top: 2px; flex-shrink: 0; }
+    .compare-col.new ul li::before { content: "✓"; color: #22c55e; font-size: 0.75rem; margin-top: 2px; flex-shrink: 0; }
+
+    /* ── Callout box ── */
+    .callout {
+      border-left: 4px solid #3b82f6;
+      background: #0d1b2a;
+      border-radius: 0 12px 12px 0;
+      padding: 1rem 1.2rem;
+      margin: 1.8rem 0;
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      line-height: 1.65;
+    }
+    .callout.green { border-color: #22c55e; background: #0a1f14; }
+    .callout.orange { border-color: #f97316; background: #1c1208; }
+    .callout strong { color: #f8fafc; }
+
+    /* ── Feature pill list ── */
+    .feature-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 1.4rem 0;
+    }
+    .pill {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 999px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+    .pill.blue  { border-color: #1d4ed8; color: #93c5fd; background: #0c1a3a; }
+    .pill.green { border-color: #15803d; color: #86efac; background: #052e16; }
+    .pill.purple{ border-color: #7e22ce; color: #d8b4fe; background: #1e0a3a; }
+    .pill.orange{ border-color: #c2410c; color: #fdba74; background: #2d1200; }
+
+    /* ── Stat highlight boxes ── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    @media (max-width: 560px) { .stat-row { grid-template-columns: 1fr 1fr; } }
+    .stat-box {
+      background: #0f1117;
+      border: 1px solid #1e2230;
+      border-radius: 14px;
+      padding: 1.2rem 1rem;
+      text-align: center;
+    }
+    .stat-box .stat-num {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #38bdf8;
+      line-height: 1;
+    }
+    .stat-box .stat-lbl {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.35rem;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- READING PROGRESS BAR -->
+  <div id="progress-bar"></div>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="../index.html" class="nav-brand">AI & <span>Automation</span> Chronicle</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <div class="breadcrumb-inner">
+      <a href="../index.html">Home</a>
+      <span class="breadcrumb-sep">&#8250;</span>
+      <span class="breadcrumb-current">Week 02 &middot; Is Monday.com the New Excel?</span>
+    </div>
+  </div>
+
+  <!-- POST HEADER -->
+  <div class="post-header">
+    <div class="post-header-inner">
+      <span class="post-week">Week 02 &middot; March 2026</span>
+      <h1>Is Monday.com the New Excel &mdash; but with AI that actually thinks?</h1>
+      <div class="post-header-meta">
+        <span>March 12, 2026 &middot; by Satish K C</span>
+        <span>10 min read</span>
+      </div>
+      <div class="post-header-tags">
+        <span class="tag orange">Agents</span>
+        <span class="tag green">Automation</span>
+        <span class="tag purple">LLMs</span>
+        <span class="tag">No-Code</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- POST BODY -->
+  <div class="post-body">
+
+    <h2>The Big Idea</h2>
+    <p>
+      For three decades, <strong>Excel was the universal operating system of business</strong>. Every team ran on it.
+      Every process lived in a spreadsheet. Budget tracking, project planning, client lists, status reports &mdash;
+      all of it: rows and columns.
+    </p>
+    <p>
+      But spreadsheets were never built for how modern teams actually work. They don't collaborate in real time.
+      They don't send you alerts. They definitely don't think. You do all the cognitive work &mdash; the tool just stores the result.
+    </p>
+    <p>
+      Monday.com started as a prettier Trello. Now it's quietly evolving into something far more interesting:
+      a <strong>Work OS with an AI layer that actively participates in your workflow</strong>. This post breaks down
+      exactly what that means, how the AI works under the hood, and why it matters.
+    </p>
+
+    <div class="callout">
+      <strong>Key distinction:</strong> Monday.com's AI is not a chatbot bolted onto a project tool.
+      It is a layer of intelligence woven into the data structure of your boards &mdash; reading, writing,
+      summarizing, routing, and predicting directly inside your existing workflow.
+    </div>
+
+    <!-- DIAGRAM 1: Old vs New -->
+    <h2>The Old Way vs The AI Way</h2>
+    <p>
+      Before we get into Monday's AI features, it helps to visualize the fundamental shift happening here.
+      This is not about adding a chat window. It is about changing who does the cognitive work.
+    </p>
+
+    <div class="diagram-wrap">
+      <div class="diagram-title">Work OS Evolution — Where the thinking happens</div>
+      <svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" width="720" height="260">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#4b5563"/>
+          </marker>
+          <marker id="arr-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#38bdf8"/>
+          </marker>
+          <linearGradient id="nodeGradOld" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#1f2937"/>
+            <stop offset="100%" style="stop-color:#111827"/>
+          </linearGradient>
+          <linearGradient id="nodeGradNew" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#0c2a4a"/>
+            <stop offset="100%" style="stop-color:#071828"/>
+          </linearGradient>
+        </defs>
+
+        <!-- OLD WAY label -->
+        <text x="160" y="22" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#6b7280" letter-spacing="2">OLD WAY</text>
+
+        <!-- OLD nodes -->
+        <rect x="20" y="36" width="110" height="44" rx="10" fill="url(#nodeGradOld)" stroke="#374151" stroke-width="1"/>
+        <text x="75" y="55" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#9ca3af" font-weight="600">Raw Data</text>
+        <text x="75" y="70" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">enters the tool</text>
+
+        <line x1="130" y1="58" x2="158" y2="58" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <rect x="158" y="36" width="110" height="44" rx="10" fill="url(#nodeGradOld)" stroke="#374151" stroke-width="1"/>
+        <text x="213" y="55" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#9ca3af" font-weight="600">YOU think</text>
+        <text x="213" y="70" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#ef4444">all cognitive load</text>
+
+        <line x1="268" y1="58" x2="296" y2="58" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <rect x="296" y="36" width="110" height="44" rx="10" fill="url(#nodeGradOld)" stroke="#374151" stroke-width="1"/>
+        <text x="351" y="55" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#9ca3af" font-weight="600">Manual Update</text>
+        <text x="351" y="70" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">formulas, copy-paste</text>
+
+        <!-- divider -->
+        <line x1="20" y1="130" x2="700" y2="130" stroke="#1f2937" stroke-width="1" stroke-dasharray="6,4"/>
+
+        <!-- NEW WAY label -->
+        <text x="160" y="155" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#38bdf8" letter-spacing="2">AI WAY (MONDAY.COM)</text>
+
+        <!-- NEW nodes -->
+        <rect x="20" y="168" width="110" height="44" rx="10" fill="url(#nodeGradNew)" stroke="#1d4ed8" stroke-width="1"/>
+        <text x="75" y="187" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#93c5fd" font-weight="600">Raw Data</text>
+        <text x="75" y="202" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">enters the tool</text>
+
+        <line x1="130" y1="190" x2="158" y2="190" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+
+        <rect x="158" y="168" width="110" height="44" rx="10" fill="#071e3d" stroke="#1e40af" stroke-width="1.5"/>
+        <text x="213" y="185" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#60a5fa" font-weight="700">AI Layer</text>
+        <text x="213" y="200" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#38bdf8">reads, classifies, routes</text>
+        <text x="213" y="212" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">GPT-4 / Claude inside</text>
+
+        <line x1="268" y1="190" x2="296" y2="190" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+
+        <rect x="296" y="168" width="110" height="44" rx="10" fill="url(#nodeGradNew)" stroke="#1d4ed8" stroke-width="1"/>
+        <text x="351" y="187" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#93c5fd" font-weight="600">Auto-Updated</text>
+        <text x="351" y="202" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">board, column, alert</text>
+
+        <line x1="406" y1="190" x2="434" y2="190" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arr-blue)"/>
+
+        <rect x="434" y="168" width="120" height="44" rx="10" fill="url(#nodeGradNew)" stroke="#15803d" stroke-width="1"/>
+        <text x="494" y="187" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#86efac" font-weight="600">YOU decide</text>
+        <text x="494" y="202" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">only strategic choices</text>
+
+        <!-- YOU think vs YOU decide arrow connection hint -->
+        <text x="620" y="58" text-anchor="start" font-family="Inter,sans-serif" font-size="9" fill="#ef4444">100% manual</text>
+        <text x="620" y="190" text-anchor="start" font-family="Inter,sans-serif" font-size="9" fill="#22c55e">AI handles 80%</text>
+      </svg>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-col old">
+        <h4>Excel / Manual Tools</h4>
+        <ul>
+          <li>You write every formula by hand</li>
+          <li>Status updates require a meeting</li>
+          <li>No proactive alerts — you check manually</li>
+          <li>Reports take hours to compile</li>
+          <li>Automation needs a developer</li>
+          <li>Predicts nothing</li>
+        </ul>
+      </div>
+      <div class="compare-col new">
+        <h4>Monday.com AI Layer</h4>
+        <ul>
+          <li>AI column fills itself from context</li>
+          <li>AI summarizes threads and status instantly</li>
+          <li>Proactive alerts based on risk detection</li>
+          <li>One-click AI report generation</li>
+          <li>Natural language automation, no code</li>
+          <li>Predicts project health before issues arise</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- DIAGRAM 2: AI Feature Pipeline -->
+    <h2>Monday.com's AI Feature Pipeline</h2>
+    <p>
+      Monday.com has not shipped "one AI feature". It has built an interconnected AI pipeline that sits
+      across five distinct layers of your workflow. Here is what that looks like end-to-end:
+    </p>
+
+    <div class="diagram-wrap">
+      <div class="diagram-title">Monday.com AI Pipeline — 5 Layers of Intelligence</div>
+      <svg viewBox="0 0 740 380" xmlns="http://www.w3.org/2000/svg" width="740" height="380">
+        <defs>
+          <marker id="a2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#38bdf8"/>
+          </marker>
+          <linearGradient id="layerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#0c1a3a;stop-opacity:1"/>
+            <stop offset="100%" style="stop-color:#071020;stop-opacity:1"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Layer 1: Input -->
+        <rect x="10" y="20" width="150" height="68" rx="12" fill="#111827" stroke="#374151" stroke-width="1"/>
+        <rect x="10" y="20" width="4" height="68" rx="2" fill="#6366f1"/>
+        <text x="90" y="44" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="700" fill="#a5b4fc">Layer 1</text>
+        <text x="90" y="60" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#9ca3af" font-weight="600">NATURAL LANGUAGE IN</text>
+        <text x="90" y="76" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">"remind me when deals are late"</text>
+
+        <!-- Arrow down -->
+        <line x1="85" y1="88" x2="85" y2="114" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#a2)"/>
+
+        <!-- Layer 2: AI Understanding -->
+        <rect x="10" y="114" width="150" height="68" rx="12" fill="#071e3d" stroke="#1e40af" stroke-width="1.5"/>
+        <rect x="10" y="114" width="4" height="68" rx="2" fill="#38bdf8"/>
+        <text x="90" y="138" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="700" fill="#38bdf8">Layer 2</text>
+        <text x="90" y="154" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#93c5fd" font-weight="600">AI UNDERSTANDING</text>
+        <text x="90" y="170" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">intent parsing, entity extraction</text>
+
+        <!-- Arrow down -->
+        <line x1="85" y1="182" x2="85" y2="208" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#a2)"/>
+
+        <!-- Layer 3: Action -->
+        <rect x="10" y="208" width="150" height="68" rx="12" fill="#111827" stroke="#374151" stroke-width="1"/>
+        <rect x="10" y="208" width="4" height="68" rx="2" fill="#22c55e"/>
+        <text x="90" y="232" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="700" fill="#86efac">Layer 3</text>
+        <text x="90" y="248" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#9ca3af" font-weight="600">ACTION BUILDER</text>
+        <text x="90" y="264" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">generates automations + boards</text>
+
+        <!-- Arrow down -->
+        <line x1="85" y1="276" x2="85" y2="302" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#a2)"/>
+
+        <!-- Layer 4: Board Intelligence -->
+        <rect x="10" y="302" width="150" height="68" rx="12" fill="#111827" stroke="#374151" stroke-width="1"/>
+        <rect x="10" y="302" width="4" height="68" rx="2" fill="#f59e0b"/>
+        <text x="90" y="326" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="700" fill="#fcd34d">Layer 4</text>
+        <text x="90" y="342" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#9ca3af" font-weight="600">BOARD INTELLIGENCE</text>
+        <text x="90" y="358" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">AI columns, auto-fill, classify</text>
+
+        <!-- RIGHT SIDE: Feature callouts -->
+
+        <!-- Feature boxes on the right, connected with horizontal arrows -->
+
+        <!-- L1 callout -->
+        <line x1="160" y1="54" x2="230" y2="54" stroke="#6366f1" stroke-width="1.2" stroke-dasharray="4,3"/>
+        <rect x="230" y="30" width="200" height="48" rx="10" fill="#0f0f1a" stroke="#312e81" stroke-width="1"/>
+        <text x="330" y="50" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#c4b5fd" font-weight="600">AI Automation Builder</text>
+        <text x="330" y="66" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">Type instructions, get automation rules</text>
+
+        <!-- L2 callout -->
+        <line x1="160" y1="148" x2="230" y2="148" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="4,3"/>
+        <rect x="230" y="124" width="200" height="48" rx="10" fill="#071828" stroke="#1d4ed8" stroke-width="1"/>
+        <text x="330" y="144" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#93c5fd" font-weight="600">AI Summaries</text>
+        <text x="330" y="160" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">Condense updates, threads, docs</text>
+
+        <!-- L3 callout -->
+        <line x1="160" y1="242" x2="230" y2="242" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="4,3"/>
+        <rect x="230" y="218" width="200" height="48" rx="10" fill="#052e16" stroke="#15803d" stroke-width="1"/>
+        <text x="330" y="238" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#86efac" font-weight="600">AI Project Builder</text>
+        <text x="330" y="254" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">One brief → full board + timeline</text>
+
+        <!-- L4 callout -->
+        <line x1="160" y1="336" x2="230" y2="336" stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="4,3"/>
+        <rect x="230" y="312" width="200" height="48" rx="10" fill="#1c0f00" stroke="#92400e" stroke-width="1"/>
+        <text x="330" y="332" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#fcd34d" font-weight="600">AI Column</text>
+        <text x="330" y="348" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">Sentiment, classification, auto-fill data</text>
+
+        <!-- FAR RIGHT: Output column -->
+        <rect x="470" y="80" width="240" height="220" rx="14" fill="#0a0f1a" stroke="#1e2230" stroke-width="1"/>
+        <text x="590" y="105" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#38bdf8" letter-spacing="1.5">WHAT YOU GET</text>
+
+        <text x="485" y="130" font-family="Inter,sans-serif" font-size="10" fill="#22c55e">+</text>
+        <text x="498" y="130" font-family="Inter,sans-serif" font-size="10" fill="#d1d5db">Zero-code automations live in minutes</text>
+        <text x="485" y="152" font-family="Inter,sans-serif" font-size="10" fill="#22c55e">+</text>
+        <text x="498" y="152" font-family="Inter,sans-serif" font-size="10" fill="#d1d5db">Boards generated from a sentence</text>
+        <text x="485" y="174" font-family="Inter,sans-serif" font-size="10" fill="#22c55e">+</text>
+        <text x="498" y="174" font-family="Inter,sans-serif" font-size="10" fill="#d1d5db">Real-time project health score</text>
+        <text x="485" y="196" font-family="Inter,sans-serif" font-size="10" fill="#22c55e">+</text>
+        <text x="498" y="196" font-family="Inter,sans-serif" font-size="10" fill="#d1d5db">AI-written status reports, instantly</text>
+        <text x="485" y="218" font-family="Inter,sans-serif" font-size="10" fill="#22c55e">+</text>
+        <text x="498" y="218" font-family="Inter,sans-serif" font-size="10" fill="#d1d5db">Smart doc generation from live data</text>
+        <text x="485" y="240" font-family="Inter,sans-serif" font-size="10" fill="#22c55e">+</text>
+        <text x="498" y="240" font-family="Inter,sans-serif" font-size="10" fill="#d1d5db">Proactive risk alerts before delays hit</text>
+        <text x="485" y="262" font-family="Inter,sans-serif" font-size="10" fill="#22c55e">+</text>
+        <text x="498" y="262" font-family="Inter,sans-serif" font-size="10" fill="#d1d5db">Sentiment tagging across all items</text>
+
+        <!-- connector from feature boxes to output -->
+        <line x1="430" y1="148" x2="470" y2="185" stroke="#1e2230" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="430" y1="242" x2="470" y2="185" stroke="#1e2230" stroke-width="1" stroke-dasharray="3,3"/>
+      </svg>
+    </div>
+
+    <h2>The 5 AI Features That Actually Change Your Workflow</h2>
+    <p>Let's go beyond the marketing and look at what each feature concretely does:</p>
+
+    <div class="feature-pills">
+      <span class="pill blue">AI Column</span>
+      <span class="pill green">Automation Builder</span>
+      <span class="pill purple">AI Summaries</span>
+      <span class="pill orange">Project Generator</span>
+      <span class="pill blue">Smart Docs</span>
+    </div>
+
+    <p>
+      <strong>1. AI Column</strong> &mdash; This is the most powerful feature. You add an AI column to any board
+      and configure it with a prompt like <em>"classify this item as High / Medium / Low priority based on the description"</em>
+      or <em>"summarize the latest update in one sentence"</em>. Every row processes automatically. No formulas.
+      No copy-pasting. The AI reads your own data and writes back into the board.
+    </p>
+
+    <p>
+      <strong>2. Natural Language Automation Builder</strong> &mdash; Instead of clicking through a visual automation
+      editor, you just type: <em>"When a deal's close date passes without being marked won, notify the owner and move it to At Risk"</em>.
+      Monday's AI parses the intent, builds the automation logic, and deploys it. This used to require a developer or an hour of Zapier config.
+    </p>
+
+    <p>
+      <strong>3. AI Summaries</strong> &mdash; Every item, thread, and project can be summarized on demand.
+      Instead of reading 40 update messages to understand what happened on a project, you click one button
+      and get a three-sentence briefing. Enormous time saver for managers.
+    </p>
+
+    <p>
+      <strong>4. AI Project Generator</strong> &mdash; You type a one-line brief: <em>"Launch campaign for new product Q3"</em>.
+      Monday generates a complete project board: tasks, owners, deadlines, dependencies, status columns.
+      It is not perfect, but it gives you an 80% starting point in seconds instead of hours.
+    </p>
+
+    <p>
+      <strong>5. AI-Powered Documents (WorkDocs)</strong> &mdash; Monday's docs now pull live data from your boards.
+      You can generate a status report that automatically references real task completion rates, overdue items,
+      and team assignments. The document updates as the board changes.
+    </p>
+
+    <!-- DIAGRAM 3: Natural Language → Automation Flow -->
+    <h2>How Natural Language Becomes a Live Automation</h2>
+    <p>
+      This is the part most people don't think about. When you type a request in plain English, what actually happens?
+    </p>
+
+    <div class="diagram-wrap">
+      <div class="diagram-title">From Plain English to Live Workflow — Step by Step</div>
+      <svg viewBox="0 0 700 120" xmlns="http://www.w3.org/2000/svg" width="700" height="120">
+        <defs>
+          <marker id="a3" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L7,3 z" fill="#38bdf8"/>
+          </marker>
+        </defs>
+
+        <!-- Step boxes -->
+        <!-- Step 1 -->
+        <rect x="10" y="30" width="110" height="56" rx="10" fill="#0a1628" stroke="#1d4ed8" stroke-width="1.5"/>
+        <text x="65" y="53" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#93c5fd" font-weight="700">YOU TYPE</text>
+        <text x="65" y="68" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">"Notify me when</text>
+        <text x="65" y="80" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">deal is overdue"</text>
+        <text x="65" y="15" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#4b5563" font-weight="600">1</text>
+
+        <line x1="120" y1="58" x2="150" y2="58" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#a3)"/>
+
+        <!-- Step 2 -->
+        <rect x="150" y="30" width="110" height="56" rx="10" fill="#071e3d" stroke="#1e40af" stroke-width="1.5"/>
+        <text x="205" y="53" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#60a5fa" font-weight="700">LLM PARSES</text>
+        <text x="205" y="68" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">intent: notification</text>
+        <text x="205" y="80" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">trigger: date passed</text>
+        <text x="205" y="15" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#4b5563" font-weight="600">2</text>
+
+        <line x1="260" y1="58" x2="290" y2="58" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#a3)"/>
+
+        <!-- Step 3 -->
+        <rect x="290" y="30" width="110" height="56" rx="10" fill="#0f1a0a" stroke="#15803d" stroke-width="1.5"/>
+        <text x="345" y="53" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#86efac" font-weight="700">LOGIC BUILT</text>
+        <text x="345" y="68" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">WHEN close_date</text>
+        <text x="345" y="80" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">passes &amp; status != won</text>
+        <text x="345" y="15" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#4b5563" font-weight="600">3</text>
+
+        <line x1="400" y1="58" x2="430" y2="58" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#a3)"/>
+
+        <!-- Step 4 -->
+        <rect x="430" y="30" width="110" height="56" rx="10" fill="#1c0f00" stroke="#92400e" stroke-width="1.5"/>
+        <text x="485" y="53" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#fcd34d" font-weight="700">YOU REVIEW</text>
+        <text x="485" y="68" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">preview shown,</text>
+        <text x="485" y="80" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">one click to save</text>
+        <text x="485" y="15" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#4b5563" font-weight="600">4</text>
+
+        <line x1="540" y1="58" x2="570" y2="58" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#a3)"/>
+
+        <!-- Step 5 -->
+        <rect x="570" y="30" width="110" height="56" rx="10" fill="#052e16" stroke="#166534" stroke-width="1.5"/>
+        <text x="625" y="53" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#4ade80" font-weight="700">AUTOMATION</text>
+        <text x="625" y="66" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#4ade80" font-weight="700">IS LIVE</text>
+        <text x="625" y="80" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">runs 24/7, zero code</text>
+        <text x="625" y="15" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#4b5563" font-weight="600">5</text>
+      </svg>
+    </div>
+
+    <h2>Key Findings</h2>
+    <ul>
+      <li><strong>AI Column</strong> turns every board into a smart database &mdash; sentiment, classification, summarization, auto-fill, all configurable per column with a natural language prompt.</li>
+      <li><strong>Natural language automations</strong> remove the last technical barrier to workflow automation &mdash; if you can describe a process, you can automate it.</li>
+      <li><strong>AI project generation</strong> compresses hours of planning into seconds &mdash; not perfect, but a powerful starting point.</li>
+      <li><strong>WorkDocs AI</strong> bridges the gap between live operational data and polished communication &mdash; reports, briefs, and updates write themselves.</li>
+      <li><strong>Proactive health scoring</strong> shifts teams from reactive firefighting to predictive management.</li>
+    </ul>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-num">80%</div>
+        <div class="stat-lbl">reduction in time-to-automation vs manual builders</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">5x</div>
+        <div class="stat-lbl">faster project setup with AI board generator</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">0</div>
+        <div class="stat-lbl">lines of code needed for any of these features</div>
+      </div>
+    </div>
+
+    <h2>Why This Matters for AI and Automation Practitioners</h2>
+    <p>
+      For years, "intelligent workflow automation" meant either expensive enterprise platforms or complex n8n/Zapier
+      setups requiring technical knowledge. Monday.com is collapsing that gap for non-technical teams.
+    </p>
+    <p>
+      But here is what's more interesting from a systems perspective: Monday is not replacing automation tools.
+      It is making the <em>adoption layer</em> intelligent. The hardest part of automation has never been the
+      technology &mdash; it's getting non-technical people to define and trust automated processes. Natural
+      language input solves that problem.
+    </p>
+    <div class="callout green">
+      <strong>The shift:</strong> Automation used to require someone who could think in logic trees
+      (IF this, THEN that). Monday's AI lets people think in outcomes
+      ("I want to know when deals go stale") and translates to logic automatically. That is a fundamental
+      democratization of workflow automation.
+    </div>
+    <p>
+      For AI/automation builders, Monday.com is also worth watching as a design pattern. The AI does not
+      replace the user's judgment &mdash; it handles the mechanical translation between intent and implementation.
+      That is a model worth borrowing in your own agent and automation designs.
+    </p>
+
+    <div class="callout orange">
+      <strong>The risk:</strong> Heavy reliance on AI-generated automations without human review creates
+      "ghost workflows" &mdash; rules nobody remembers setting up, running in the background, doing the wrong
+      thing. The preview-and-confirm step in Monday's UX is critical. Don't skip it.
+    </div>
+
+    <h2>My Take</h2>
+    <p>
+      Monday.com is not the new Excel. Excel was a blank canvas &mdash; powerful but passive.
+      Monday is building something different: a canvas that <em>participates</em>. It reads your data,
+      understands your intent, and proposes the next step.
+    </p>
+    <p>
+      The Excel comparison is useful for marketing, but undersells what is actually being built here.
+      The real comparison is closer to the difference between a filing cabinet and an EA (executive assistant).
+      Both store your information. One just does a lot more with it.
+    </p>
+    <p>
+      What I find most technically interesting is not the flashy AI features &mdash; it is the AI Column.
+      It essentially turns every row in a board into a structured AI-processing pipeline. That is a
+      surprisingly powerful primitive, and most people using Monday.com have no idea it exists.
+    </p>
+    <p>
+      If you manage a team and you are still copy-pasting status updates into a spreadsheet every Friday,
+      that is the clearest sign you should be looking at this.
+    </p>
+
+    <p>
+      <strong>Discussion question:</strong> Is AI-embedded work management tools like Monday.com ultimately good
+      for automation practitioners &mdash; or do they commoditize the skills that used to make us valuable?
+      And where does the line sit between "AI making work easier" and "AI making teams intellectually lazy"?
+      Drop your thoughts below.
+    </p>
+
+  </div>
+
+  <!-- SHARE SECTION -->
+  <div class="share-section">
+    <h3>Share this discussion</h3>
+    <div class="share-buttons">
+      <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fsatishkc7.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-02.html&title=Is%20Monday.com%20the%20New%20Excel%3F"
+         target="_blank" rel="noopener" class="share-btn linkedin">
+        LinkedIn
+      </a>
+      <a href="https://twitter.com/intent/tweet?text=Is%20Monday.com%20the%20new%20Excel%20%E2%80%94%20but%20with%20AI%20that%20actually%20thinks%3F&url=https%3A%2F%2Fsatishkc7.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-02.html"
+         target="_blank" rel="noopener" class="share-btn twitter">
+        X / Twitter
+      </a>
+      <button class="share-btn copy" id="copy-btn" onclick="
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          this.textContent = 'Copied!';
+          setTimeout(() => { this.textContent = 'Copy Link'; }, 2000);
+        });
+      ">
+        Copy Link
+      </button>
+    </div>
+  </div>
+
+  <!-- POST NAVIGATION -->
+  <div class="post-nav">
+    <a href="../index.html">&#8592; Back to all papers</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <a href="../about.html">About</a>
+      <a href="https://github.com/satishkc7" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://linkedin.com/in/satishkc7" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <p>&copy; 2026 AI &amp; Automation Chronicle &middot; Built by <a href="https://github.com/satishkc7" target="_blank" rel="noopener">Satish K C</a></p>
+  </footer>
+
+  <!-- READING PROGRESS SCRIPT -->
+  <script>
+    const bar = document.getElementById('progress-bar');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = docHeight > 0 ? (scrollTop / docHeight * 100) + '%' : '0%';
+    });
+  </script>
+
+</body>
+</html>
