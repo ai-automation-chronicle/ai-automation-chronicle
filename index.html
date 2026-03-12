@@ -63,7 +63,62 @@
 
       <!-- PAPER CARD — duplicate this block each week -->
       <a href="posts/week-01.html" class="paper-card">
-        <div class="paper-card-placeholder">&#128196;</div>
+        <div class="paper-card-placeholder" style="background:none;padding:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 170" width="100%" height="170" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="w01bg" x1="0" y1="0" x2="400" y2="170" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#04101E"/>
+                <stop offset="100%" stop-color="#092545"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="170" fill="url(#w01bg)"/>
+            <!-- Grid lines -->
+            <g stroke="#162E48" stroke-width="0.7">
+              <line x1="0" y1="56" x2="400" y2="56"/>
+              <line x1="0" y1="112" x2="400" y2="112"/>
+              <line x1="80" y1="0" x2="80" y2="170"/>
+              <line x1="200" y1="0" x2="200" y2="170"/>
+              <line x1="320" y1="0" x2="320" y2="170"/>
+            </g>
+            <!-- Attention arcs — strong orange (V -> central output) -->
+            <path d="M200,122 C200,90 200,65 200,44" fill="none" stroke="#E04D14" stroke-width="2.5" opacity="0.88"/>
+            <path d="M120,122 C155,92 178,68 200,44" fill="none" stroke="#E04D14" stroke-width="1.8" opacity="0.65"/>
+            <path d="M280,122 C245,92 222,68 200,44" fill="none" stroke="#E04D14" stroke-width="1.8" opacity="0.65"/>
+            <!-- Medium blue cross-attention -->
+            <path d="M60,122 C105,96 158,70 200,44" fill="none" stroke="#3A8EC8" stroke-width="1" opacity="0.42"/>
+            <path d="M340,122 C295,96 242,70 200,44" fill="none" stroke="#3A8EC8" stroke-width="1" opacity="0.42"/>
+            <path d="M120,122 C165,98 235,75 300,44" fill="none" stroke="#3A8EC8" stroke-width="1.2" opacity="0.35"/>
+            <path d="M280,122 C235,98 165,75 100,44" fill="none" stroke="#3A8EC8" stroke-width="1.2" opacity="0.35"/>
+            <!-- Faint long-range attention -->
+            <path d="M60,122 C160,105 260,88 340,44" fill="none" stroke="#E04D14" stroke-width="0.5" opacity="0.15"/>
+            <path d="M340,122 C240,105 140,88 60,44" fill="none" stroke="#3A8EC8" stroke-width="0.5" opacity="0.12"/>
+            <!-- Input nodes -->
+            <circle cx="60" cy="122" r="11" fill="#081828" stroke="#1D5080" stroke-width="1.5"/>
+            <text x="60" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="#5AAAD0">Q</text>
+            <circle cx="120" cy="122" r="11" fill="#081828" stroke="#1D5080" stroke-width="1.5"/>
+            <text x="120" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="#5AAAD0">K</text>
+            <!-- Central V node with glow -->
+            <circle cx="200" cy="122" r="20" fill="#E04D14" opacity="0.1"/>
+            <circle cx="200" cy="122" r="13" fill="#1A0800" stroke="#E04D14" stroke-width="2.2"/>
+            <text x="200" y="127" text-anchor="middle" font-family="monospace" font-size="11" fill="#E04D14" font-weight="bold">V</text>
+            <circle cx="280" cy="122" r="11" fill="#081828" stroke="#1D5080" stroke-width="1.5"/>
+            <text x="280" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="#5AAAD0">K</text>
+            <circle cx="340" cy="122" r="11" fill="#081828" stroke="#1D5080" stroke-width="1.5"/>
+            <text x="340" y="126" text-anchor="middle" font-family="monospace" font-size="9" fill="#5AAAD0">Q</text>
+            <!-- Output nodes -->
+            <circle cx="100" cy="44" r="11" fill="#081828" stroke="#1D5080" stroke-width="1.5"/>
+            <text x="100" y="48" text-anchor="middle" font-family="monospace" font-size="8" fill="#5AAAD0">h1</text>
+            <!-- Central Attn output with glow -->
+            <circle cx="200" cy="44" r="22" fill="#E04D14" opacity="0.12"/>
+            <circle cx="200" cy="44" r="14" fill="#1A0800" stroke="#E04D14" stroke-width="2.5"/>
+            <text x="200" y="49" text-anchor="middle" font-family="monospace" font-size="9" fill="#E04D14" font-weight="bold">Attn</text>
+            <circle cx="300" cy="44" r="11" fill="#081828" stroke="#1D5080" stroke-width="1.5"/>
+            <text x="300" y="48" text-anchor="middle" font-family="monospace" font-size="8" fill="#5AAAD0">h3</text>
+            <!-- Bottom label strip -->
+            <rect x="0" y="153" width="400" height="17" fill="#020B17" opacity="0.92"/>
+            <text x="200" y="164" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7.5" fill="#5AAAD0" letter-spacing="2.5">MULTI-HEAD ATTENTION · TRANSFORMER ARCHITECTURE</text>
+          </svg>
+        </div>
         <div class="paper-card-body">
           <div class="paper-week">Week 01 · March 2026</div>
           <h3>Attention Is All You Need — Revisited</h3>
@@ -77,7 +132,90 @@
 
       <!-- PAPER CARD — Week 02 -->
       <a href="posts/week-02.html" class="paper-card">
-        <div class="paper-card-placeholder">&#129504;</div>
+        <div class="paper-card-placeholder" style="background:none;padding:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 170" width="100%" height="170" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="w02bg" x1="0" y1="0" x2="400" y2="170" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#0D0700"/>
+                <stop offset="100%" stop-color="#221200"/>
+              </linearGradient>
+              <linearGradient id="w02p1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#E04D14"/>
+                <stop offset="100%" stop-color="#F5893A"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="170" fill="url(#w02bg)"/>
+            <!-- COLUMN 1: TODO -->
+            <rect x="15" y="18" width="108" height="136" rx="5" fill="#180C00" stroke="#3D1E00" stroke-width="1"/>
+            <rect x="15" y="18" width="108" height="22" rx="5" fill="#3D2200"/>
+            <rect x="15" y="29" width="108" height="11" fill="#3D2200"/>
+            <text x="69" y="34" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8.5" fill="#8A5020" font-weight="600" letter-spacing="1">TODO</text>
+            <rect x="23" y="48" width="92" height="22" rx="3" fill="#231200" stroke="#3D2000" stroke-width="0.8"/>
+            <rect x="31" y="55" width="5" height="5" rx="1.5" fill="#5A3010"/>
+            <rect x="41" y="55" width="48" height="4" rx="2" fill="#4A2808"/>
+            <rect x="41" y="62" width="34" height="3" rx="1.5" fill="#3A1E06"/>
+            <rect x="23" y="76" width="92" height="22" rx="3" fill="#231200" stroke="#3D2000" stroke-width="0.8"/>
+            <rect x="31" y="83" width="5" height="5" rx="1.5" fill="#5A3010"/>
+            <rect x="41" y="83" width="40" height="4" rx="2" fill="#4A2808"/>
+            <rect x="41" y="90" width="28" height="3" rx="1.5" fill="#3A1E06"/>
+            <rect x="23" y="104" width="92" height="22" rx="3" fill="#231200" stroke="#3D2000" stroke-width="0.8"/>
+            <rect x="31" y="111" width="5" height="5" rx="1.5" fill="#5A3010"/>
+            <rect x="41" y="111" width="54" height="4" rx="2" fill="#4A2808"/>
+            <rect x="41" y="118" width="38" height="3" rx="1.5" fill="#3A1E06"/>
+            <!-- COLUMN 2: IN PROGRESS -->
+            <rect x="146" y="18" width="108" height="136" rx="5" fill="#1A0900" stroke="#5A2800" stroke-width="1"/>
+            <rect x="146" y="18" width="108" height="22" rx="5" fill="#E04D14" opacity="0.2"/>
+            <rect x="146" y="29" width="108" height="11" fill="#E04D14" opacity="0.2"/>
+            <text x="200" y="34" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7.5" fill="#E07040" font-weight="600" letter-spacing="0.8">IN PROGRESS</text>
+            <!-- Card 1 + progress bar -->
+            <rect x="154" y="48" width="92" height="32" rx="3" fill="#201000" stroke="#5A2800" stroke-width="0.8"/>
+            <circle cx="164" cy="57" r="4" fill="#E04D14" opacity="0.5"/>
+            <rect x="173" y="53" width="50" height="4" rx="2" fill="#5A3010"/>
+            <rect x="173" y="60" width="38" height="3" rx="1.5" fill="#3A2000"/>
+            <rect x="154" y="74" width="92" height="4" rx="2" fill="#3D1A00"/>
+            <rect x="154" y="74" width="58" height="4" rx="2" fill="url(#w02p1)"/>
+            <!-- Card 2 + progress bar -->
+            <rect x="154" y="90" width="92" height="32" rx="3" fill="#201000" stroke="#5A2800" stroke-width="0.8"/>
+            <circle cx="164" cy="99" r="4" fill="#E04D14" opacity="0.75"/>
+            <rect x="173" y="95" width="44" height="4" rx="2" fill="#5A3010"/>
+            <rect x="173" y="102" width="32" height="3" rx="1.5" fill="#3A2000"/>
+            <rect x="154" y="116" width="92" height="4" rx="2" fill="#3D1A00"/>
+            <rect x="154" y="116" width="76" height="4" rx="2" fill="url(#w02p1)"/>
+            <!-- AI badge -->
+            <rect x="224" y="132" width="24" height="13" rx="6.5" fill="#E04D14" opacity="0.25"/>
+            <text x="236" y="142" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#E07040" font-weight="700">AI</text>
+            <!-- COLUMN 3: DONE -->
+            <rect x="277" y="18" width="108" height="136" rx="5" fill="#0A1408" stroke="#1E3D10" stroke-width="1"/>
+            <rect x="277" y="18" width="108" height="22" rx="5" fill="#1A4010" opacity="0.7"/>
+            <rect x="277" y="29" width="108" height="11" fill="#1A4010" opacity="0.7"/>
+            <text x="331" y="34" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8.5" fill="#48A030" font-weight="600" letter-spacing="1">DONE</text>
+            <rect x="285" y="48" width="92" height="22" rx="3" fill="#0C1E08" stroke="#1E4010" stroke-width="0.8"/>
+            <circle cx="295" cy="59" r="5" fill="#1A7030" opacity="0.5"/>
+            <path d="M292,59 L295,62 L300,55" fill="none" stroke="#40B828" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="306" y="55" width="48" height="4" rx="2" fill="#1E3A12"/>
+            <rect x="306" y="62" width="32" height="3" rx="1.5" fill="#182E0E"/>
+            <rect x="285" y="76" width="92" height="22" rx="3" fill="#0C1E08" stroke="#1E4010" stroke-width="0.8"/>
+            <circle cx="295" cy="87" r="5" fill="#1A7030" opacity="0.5"/>
+            <path d="M292,87 L295,90 L300,83" fill="none" stroke="#40B828" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="306" y="83" width="52" height="4" rx="2" fill="#1E3A12"/>
+            <rect x="306" y="90" width="36" height="3" rx="1.5" fill="#182E0E"/>
+            <rect x="285" y="104" width="92" height="22" rx="3" fill="#0C1E08" stroke="#1E4010" stroke-width="0.8"/>
+            <circle cx="295" cy="115" r="5" fill="#1A7030" opacity="0.5"/>
+            <path d="M292,115 L295,118 L300,111" fill="none" stroke="#40B828" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="306" y="111" width="44" height="4" rx="2" fill="#1E3A12"/>
+            <rect x="306" y="118" width="30" height="3" rx="1.5" fill="#182E0E"/>
+            <!-- AI sparkle icon top center -->
+            <g transform="translate(200,11)">
+              <path d="M0,-7 L1.7,-1.7 L7,0 L1.7,1.7 L0,7 L-1.7,1.7 L-7,0 L-1.7,-1.7 Z" fill="#E04D14" opacity="0.75"/>
+              <circle cx="10" cy="-6" r="1.8" fill="#E04D14" opacity="0.4"/>
+              <circle cx="-10" cy="5" r="1.3" fill="#F5893A" opacity="0.3"/>
+              <circle cx="5" cy="10" r="1.3" fill="#E04D14" opacity="0.35"/>
+            </g>
+            <!-- Bottom label strip -->
+            <rect x="0" y="153" width="400" height="17" fill="#060300" opacity="0.92"/>
+            <text x="200" y="164" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7.5" fill="#B06030" letter-spacing="2">AI WORK OS · INTELLIGENT AUTOMATION PLATFORM</text>
+          </svg>
+        </div>
         <div class="paper-card-body">
           <div class="paper-week">Week 02 · March 2026</div>
           <h3>Is Monday.com the New Excel — but with AI that actually thinks?</h3>
