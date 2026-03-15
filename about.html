@@ -3,13 +3,160 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="About AI & Automation Chronicle — Weekly AI research breakdowns by Satish K C, Data Scientist specializing in LLMs, NLP, and Generative AI."/>
+  <meta name="description" content="About AI & Automation Chronicle — Weekly AI research breakdowns and automation insights by Satish K C, Data Scientist specializing in LLMs, NLP, and Generative AI."/>
   <meta property="og:title" content="About · AI & Automation Chronicle"/>
-  <meta property="og:description" content="Weekly AI research breakdowns by Satish K C, bridging the gap between research and real-world application."/>
+  <meta property="og:description" content="Weekly AI research paper breakdowns and automation insights by Satish K C, bridging the gap between research and real-world application."/>
   <meta property="og:type" content="website"/>
   <title>About · AI & Automation Chronicle</title>
   <link rel="stylesheet" href="assets/css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    .about-hero {
+      background: var(--bg-beige);
+      border-bottom: 1px solid var(--border-dark);
+      padding: 4rem 2rem 3.5rem;
+      text-align: center;
+    }
+    .about-hero h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.01em;
+    }
+    .about-hero h1 span { color: var(--orange); }
+    .about-hero p {
+      font-size: 1rem;
+      color: var(--text-gray);
+      max-width: 580px;
+      margin: 0 auto;
+      line-height: 1.75;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      margin: 2rem 0;
+    }
+    @media (max-width: 640px) { .about-grid { grid-template-columns: 1fr; } }
+
+    .about-card {
+      background: var(--bg-light);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .about-card-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--orange);
+      margin-bottom: 0.5rem;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .about-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+    }
+    .about-card p {
+      font-size: 0.875rem;
+      color: var(--text-gray);
+      line-height: 1.65;
+      margin: 0;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+
+    .author-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      margin: 2rem 0;
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+    }
+    @media (max-width: 640px) {
+      .author-card { flex-direction: column; gap: 1.25rem; }
+    }
+    .author-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--bg-beige);
+      border: 2px solid var(--border-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--orange);
+      font-family: Georgia, serif;
+      flex-shrink: 0;
+    }
+    .author-info h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 0.2rem;
+    }
+    .author-meta {
+      font-size: 0.8rem;
+      color: var(--text-gray);
+      font-family: 'Inter', Arial, sans-serif;
+      margin-bottom: 0.9rem;
+    }
+    .author-info p {
+      font-size: 0.9rem;
+      color: var(--text-mid);
+      line-height: 1.75;
+      margin-bottom: 0.75rem;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .author-links {
+      display: flex;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    .author-link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.45rem 1rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.825rem;
+      font-weight: 600;
+      font-family: 'Inter', Arial, sans-serif;
+      text-decoration: none;
+      transition: opacity var(--transition), transform var(--transition);
+    }
+    .author-link-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .author-link-btn.portfolio { background: var(--orange); color: var(--white); }
+    .author-link-btn.linkedin  { background: #0A66C2; color: var(--white); }
+    .author-link-btn.github    { background: #1C1C1C; color: var(--white); }
+
+    .mission-block {
+      border-left: 4px solid var(--orange);
+      background: var(--orange-light);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 1.2rem 1.5rem;
+      margin: 2rem 0;
+    }
+    .mission-block p {
+      font-size: 0.975rem;
+      color: var(--text-mid);
+      line-height: 1.75;
+      margin: 0;
+      font-family: 'Inter', Arial, sans-serif;
+    }
+    .mission-block strong { color: var(--text-dark); }
+  </style>
 </head>
 <body>
 
@@ -22,57 +169,102 @@
     </ul>
   </nav>
 
+  <!-- ABOUT HERO -->
+  <div class="about-hero">
+    <h1>About <span>AI & Automation Chronicle</span></h1>
+    <p>A publication dedicated to making cutting-edge AI research accessible, actionable, and relevant for practitioners building real systems.</p>
+  </div>
+
   <!-- ABOUT CONTENT -->
   <div class="about-section">
 
-    <h2>About <span>This Page</span></h2>
+    <!-- PUBLICATION MISSION -->
+    <h2>The <span>Publication</span></h2>
     <div class="divider"></div>
 
     <p>
-      The <strong>AI & Automation Chronicle</strong> is a weekly research discussion space for professionals,
-      researchers, and enthusiasts who want to stay ahead of the curve in Artificial Intelligence,
-      Data Science, and Automation.
+      The <strong>AI & Automation Chronicle</strong> is a weekly research and insights publication for
+      professionals, researchers, and practitioners who want to stay ahead in Artificial Intelligence,
+      Data Science, and Automation. The audience is not beginners looking for introductions - it is
+      people actively building systems who want to understand what the research actually says and
+      what it means for their work.
     </p>
-
     <p>
-      Every week, one cutting-edge research paper is selected, read, and broken down into clear,
-      actionable insights. Complex findings are translated so practitioners can actually use them.
+      Most AI research lives behind academic abstractions that are difficult to translate into
+      engineering decisions. This publication exists to close that gap. Each post reads the source
+      material directly, extracts what is technically significant, and connects it to real-world
+      implications with the precision that practitioners expect.
     </p>
 
-    <p>
-      The goal is simple: <strong>bridge the gap between research and real-world application,
-      one paper at a time.</strong>
-    </p>
+    <div class="mission-block">
+      <p><strong>The mission:</strong> Bridge the gap between what AI research produces and what practitioners can actually apply. Every post is grounded in the original paper, written with technical depth, and focused on what matters for people building AI systems today.</p>
+    </div>
 
-    <h2>About <span>the Author</span></h2>
+    <!-- TWO CONTENT TYPES -->
+    <h2>What You Will <span>Find Here</span></h2>
+    <div class="divider"></div>
+    <p>The publication covers two types of content, each with its own focus and format:</p>
+
+    <div class="about-grid">
+      <div class="about-card">
+        <div class="about-card-label">Research &amp; Ideas</div>
+        <h3>Weekly Paper Discussions</h3>
+        <p>One peer-reviewed research paper per week, broken down in full. Covers the problem, the architecture or method, key findings with real benchmark numbers, and what it means for the field. Written for practitioners who want the technical depth without reading the full paper themselves.</p>
+      </div>
+      <div class="about-card">
+        <div class="about-card-label">AI &amp; Automation in Practice</div>
+        <h3>Tools, Workflows &amp; Applications</h3>
+        <p>Analysis of how AI tools, platforms, and automation systems work under the hood. Focuses on what has changed, how it works technically, and what it means for teams building with these tools. Includes workflow diagrams, architecture breakdowns, and honest assessments of limitations.</p>
+      </div>
+    </div>
+
+    <!-- AUTHOR -->
+    <h2>About the <span>Author</span></h2>
     <div class="divider"></div>
 
-    <p>
-      Hi, I'm <strong>Satish K C</strong>, a Data Scientist based in Houston, Texas, specializing in
-      LLMs, NLP, and Generative AI. I build AI systems for legal, financial, and healthcare domains.
-    </p>
+    <div class="author-card">
+      <div class="author-avatar">SK</div>
+      <div class="author-info">
+        <h3>Satish K C</h3>
+        <div class="author-meta">Data Scientist &middot; Houston, Texas</div>
+        <p>
+          I specialize in Large Language Models, Natural Language Processing, and Generative AI,
+          with a focus on building production AI systems for legal, financial, and healthcare domains.
+          My work spans model fine-tuning, retrieval-augmented generation, agentic workflows,
+          and end-to-end automation pipelines.
+        </p>
+        <p>
+          This chronicle is my public learning practice. Every paper I cover is one I have read
+          carefully and found genuinely worth understanding. The goal is not to summarize - it is
+          to think through the implications and share that thinking with the community.
+        </p>
+        <div class="author-links">
+          <a href="https://portfolio-satishkc.vercel.app/" target="_blank" rel="noopener" class="author-link-btn portfolio">Portfolio</a>
+          <a href="https://linkedin.com/in/satishkc7" target="_blank" rel="noopener" class="author-link-btn linkedin">LinkedIn</a>
+          <a href="https://github.com/satishkc7" target="_blank" rel="noopener" class="author-link-btn github">GitHub</a>
+        </div>
+      </div>
+    </div>
 
-    <p>
-      This chronicle is my way of staying sharp, sharing what I learn, and contributing to the
-      AI and automation community.
-    </p>
+    <!-- SKILLS -->
+    <h2>Areas of <span>Expertise</span></h2>
+    <div class="divider"></div>
+    <p>Topics covered most frequently across research discussions and practical articles:</p>
 
     <div class="skills-row">
       <span class="skill-tag">LLMs</span>
       <span class="skill-tag">NLP</span>
       <span class="skill-tag">Generative AI</span>
+      <span class="skill-tag">RAG</span>
+      <span class="skill-tag">AI Agents</span>
       <span class="skill-tag">AI Automation</span>
       <span class="skill-tag">n8n</span>
-      <span class="skill-tag">Python</span>
-      <span class="skill-tag">RAG</span>
       <span class="skill-tag">VAPI</span>
+      <span class="skill-tag">Python</span>
+      <span class="skill-tag">Model Quantization</span>
+      <span class="skill-tag">Fine-tuning</span>
+      <span class="skill-tag">Workflow Automation</span>
     </div>
-
-    <p>
-      Find me on
-      <a href="https://github.com/satishkc7" target="_blank" rel="noopener" style="color: var(--cyan);">GitHub</a> &middot;
-      <a href="https://linkedin.com/in/satishkc7" target="_blank" rel="noopener" style="color: var(--cyan);">LinkedIn</a>
-    </p>
 
   </div>
 
@@ -81,10 +273,11 @@
     <div class="footer-links">
       <a href="index.html">Home</a>
       <a href="about.html">About</a>
+      <a href="https://portfolio-satishkc.vercel.app/" target="_blank" rel="noopener">Portfolio</a>
       <a href="https://github.com/satishkc7" target="_blank" rel="noopener">GitHub</a>
       <a href="https://linkedin.com/in/satishkc7" target="_blank" rel="noopener">LinkedIn</a>
     </div>
-    <p>&copy; 2026 AI &amp; Automation Chronicle &middot; Built by <a href="https://github.com/satishkc7" target="_blank" rel="noopener">Satish K C</a></p>
+    <p>&copy; 2026 AI &amp; Automation Chronicle &middot; Built by <a href="https://portfolio-satishkc.vercel.app/" target="_blank" rel="noopener">Satish K C</a></p>
   </footer>
 
 </body>
