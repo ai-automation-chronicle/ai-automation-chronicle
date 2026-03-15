@@ -268,6 +268,68 @@ nav {
   border-radius: 2px;
 }
 
+/* ---- TABS ---- */
+.tabs-bar {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 2rem;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 0.7rem 1.5rem 0.8rem;
+  cursor: pointer;
+  position: relative;
+  transition: color var(--transition);
+  text-align: left;
+}
+
+.tab-btn::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--orange);
+  border-radius: 2px 2px 0 0;
+  transition: width var(--transition);
+}
+
+.tab-btn:hover .tab-title {
+  color: var(--text-dark);
+}
+
+.tab-btn.active .tab-title {
+  color: var(--text-dark);
+}
+
+.tab-btn.active::after {
+  width: 100%;
+}
+
+.tab-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: 'Inter', Arial, sans-serif;
+  color: var(--text-gray);
+  letter-spacing: 0.01em;
+  transition: color var(--transition);
+}
+
+.tab-subtitle {
+  display: block;
+  font-size: 0.72rem;
+  font-family: 'Inter', Arial, sans-serif;
+  color: var(--text-light);
+  font-weight: 400;
+  margin-top: 0.1rem;
+  letter-spacing: 0.01em;
+}
+
 /* ---- PAPER CARDS ---- */
 .papers-grid {
   display: grid;

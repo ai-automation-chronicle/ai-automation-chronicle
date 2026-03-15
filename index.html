@@ -59,10 +59,21 @@
       <p class="section-subtitle">A new paper every week — broken down into clear, actionable insights.</p>
     </div>
 
+    <div class="tabs-bar">
+      <button class="tab-btn active" data-tab="research" onclick="switchTab(this)">
+        <span class="tab-title">Research &amp; Ideas</span>
+        <span class="tab-subtitle">Weekly AI Research Paper Discussion</span>
+      </button>
+      <button class="tab-btn" data-tab="practice" onclick="switchTab(this)">
+        <span class="tab-title">AI &amp; Automation in Practice</span>
+        <span class="tab-subtitle">Tools, workflows &amp; real-world applications</span>
+      </button>
+    </div>
+
     <div class="papers-grid">
 
       <!-- PAPER CARD — duplicate this block each week -->
-      <a href="posts/week-01.html" class="paper-card">
+      <a href="posts/week-01.html" class="paper-card" data-tab="research">
         <div class="paper-card-placeholder" style="background:none;padding:0;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 170" width="100%" height="170" preserveAspectRatio="none">
             <defs>
@@ -131,7 +142,7 @@
       </a>
 
       <!-- PAPER CARD — Week 02 -->
-      <a href="posts/week-02.html" class="paper-card">
+      <a href="posts/week-02.html" class="paper-card" data-tab="practice">
         <div class="paper-card-placeholder" style="background:none;padding:0;">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 170" width="100%" height="170" preserveAspectRatio="none">
             <defs>
@@ -257,5 +268,20 @@
     <p>&copy; 2026 AI &amp; Automation Chronicle &middot; Built by <a href="https://github.com/satishkc7" target="_blank" rel="noopener">Satish K C</a></p>
   </footer>
 
+  <script>
+    function switchTab(btn) {
+      var tab = btn.getAttribute('data-tab');
+      document.querySelectorAll('.tab-btn').forEach(function(b) {
+        b.classList.toggle('active', b === btn);
+      });
+      document.querySelectorAll('.paper-card').forEach(function(card) {
+        card.style.display = card.getAttribute('data-tab') === tab ? '' : 'none';
+      });
+    }
+    // Show only research tab cards on load
+    document.querySelectorAll('.paper-card').forEach(function(card) {
+      if (card.getAttribute('data-tab') !== 'research') card.style.display = 'none';
+    });
+  </script>
 </body>
 </html>
