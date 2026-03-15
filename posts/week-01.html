@@ -41,7 +41,7 @@
       <h1>Attention Is All You Need: Revisited</h1>
       <div class="post-header-meta">
         <span>March 8, 2026 &middot; by Satish K C</span>
-        <span>8 min read</span>
+        <span>12 min read</span>
       </div>
       <div class="post-header-tags">
         <span class="tag">Deep Learning</span>
@@ -56,141 +56,185 @@
 
     <h2>The Paper</h2>
     <p>
-      The paper is called <strong>"Attention Is All You Need"</strong>. It was written by a group of researchers
-      at Google in 2017. Their names are Vaswani, Shazeer, Parmar, and others. This paper is one of the most
-      important papers ever written in the field of AI. It introduced a new way to build AI models called
-      the <strong>Transformer</strong>.
+      <strong>"Attention Is All You Need"</strong> was published in June 2017 by a team of eight researchers
+      at Google Brain and Google Research: Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit,
+      Llion Jones, Aidan N. Gomez, Lukasz Kaiser, and Illia Polosukhin. It appeared at NeurIPS 2017 and
+      has since accumulated over 100,000 citations, making it one of the most cited papers in the history
+      of computer science.
     </p>
     <p>
-      Before this paper, almost everyone building AI for language used older methods. After this paper,
-      everything changed. If you have ever used ChatGPT, Claude, or Google Translate, you have used
-      something built on top of this paper.
+      The paper did not just introduce a new model. It proposed replacing the entire dominant paradigm
+      for sequence modeling with a single, elegantly simple mechanism: <strong>attention</strong>. That bet
+      paid off completely. Every large language model in production today, from GPT-4 to Claude to Gemini
+      to Llama, is a direct descendant of the architecture introduced in this paper.
     </p>
     <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener" class="paper-link">
-      Read the Paper &#8594;
+      Read the Paper on arXiv &#8594;
     </a>
 
-    <h2>What Was the Problem Before This Paper?</h2>
+    <h2>The Problem Before This Paper</h2>
     <p>
-      Let's say you want to teach a computer to read and understand sentences. How do you do that?
+      Prior to 2017, sequence-to-sequence tasks such as machine translation were dominated by
+      <strong>Recurrent Neural Networks (RNNs)</strong> and their more capable variant,
+      <strong>Long Short-Term Memory (LSTM)</strong> networks. These architectures processed sequences
+      token by token, left to right, maintaining a hidden state that carried information forward through
+      the sequence.
     </p>
     <p>
-      Before 2017, the most popular way was to use models called <strong>RNNs</strong> (Recurrent Neural Networks)
-      and <strong>LSTMs</strong> (Long Short-Term Memory networks). These models read a sentence one word at a time,
-      from left to right. They tried to remember what they had read before as they moved forward.
-    </p>
-    <p>
-      Think of it like reading a book but you can only look at one word at a time, and you have to try
-      to remember everything you read before. By the time you get to the end of a long sentence,
-      you have already forgotten what was at the beginning.
-    </p>
-    <p>
-      This caused two big problems:
+      This sequential nature created two fundamental bottlenecks that the field had been struggling
+      to solve for years:
     </p>
     <ul>
-      <li><strong>It was slow.</strong> You had to wait for each word to be processed before moving to the next one. You could not do many things at the same time.</li>
-      <li><strong>It forgot things.</strong> When sentences were long, the model struggled to connect words that were far apart from each other.</li>
+      <li>
+        <strong>No parallelization during training.</strong> Because each token depended on the hidden
+        state of the previous token, computations could not be parallelized across a sequence. Training
+        on long sequences was slow, and scaling to larger datasets was constrained by time and hardware.
+      </li>
+      <li>
+        <strong>Vanishing long-range dependencies.</strong> Information from early tokens had to pass
+        through every intermediate hidden state to reach later tokens. In long sequences, this signal
+        degraded, making it difficult for the model to correctly relate tokens that were far apart.
+        Techniques like attention mechanisms were already being added on top of RNNs to partially
+        address this, but they were patches on a fundamentally sequential architecture.
+      </li>
     </ul>
     <p>
-      The researchers who wrote this paper asked a simple but powerful question: what if we did not read
-      one word at a time at all? What if every word could look at every other word at the same time?
+      Vaswani et al. proposed a more radical solution: discard recurrence entirely. Build a model
+      that operates on the full sequence simultaneously, allowing every token to attend to every
+      other token directly, with no intermediate steps.
     </p>
 
-    <h2>What Did They Come Up With?</h2>
+    <h2>What They Built</h2>
     <p>
-      Their answer was something called <strong>self-attention</strong>. The idea is straightforward.
-      When the model reads a sentence, instead of going word by word, every single word gets to look
-      at all the other words at once and decide which ones are most important to it.
+      The Transformer follows an <strong>encoder-decoder</strong> architecture, standard for
+      sequence-to-sequence tasks. What made it novel was that both the encoder and decoder
+      were built entirely from stacked layers of attention and feed-forward networks, with no
+      recurrence or convolution anywhere in the design.
     </p>
     <p>
-      Here is a simple example. Take the sentence: <em>"The dog did not cross the street because it was tired."</em>
-      What does the word "it" refer to? It refers to "the dog", not "the street". A human knows this easily.
-      But for a computer, this is genuinely hard, especially if it can only read one word at a time.
+      The core mechanism is <strong>Scaled Dot-Product Attention</strong>. Given a set of queries
+      (Q), keys (K), and values (V), the attention output is computed as:
+    </p>
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #E04D14;">
+      Attention(Q, K, V) = softmax( QK<sup>T</sup> / &radic;d<sub>k</sub> ) &middot; V
     </p>
     <p>
-      With self-attention, the word "it" can directly look at all other words in the sentence and figure out
-      that "dog" is the most relevant one. It does not have to wait. It does not have to remember.
-      It just looks at everything at once.
+      Each token computes a compatibility score against every other token. These scores are scaled
+      by the square root of the key dimension (d<sub>k</sub>) to prevent extremely small gradients
+      in the softmax, then normalized and used to compute a weighted sum of the value vectors.
+      The result: every token receives a context-aware representation informed by the entire sequence
+      in a single pass.
     </p>
     <p>
-      They also added something called <strong>multi-head attention</strong>. This means the model does not
-      just look at words in one way. It looks at them in many different ways at the same time. One "head"
-      might focus on grammar. Another might focus on meaning. Another might focus on tone. All of this
-      happens at the same time, in parallel.
+      Rather than performing this once, the authors introduced <strong>Multi-Head Attention</strong>.
+      The attention function is run h times in parallel, each with its own learned projection matrices.
+      The base model uses <strong>h=8 attention heads</strong> with a model dimension of
+      <strong>d<sub>model</sub>=512</strong>. Each head independently learns to attend to different
+      aspects of the sequence, whether syntactic dependencies, semantic similarity, or co-reference.
+      The outputs are concatenated and projected back to d<sub>model</sub>.
     </p>
     <p>
-      Finally, they added <strong>positional encodings</strong>. Since the model reads all words at once,
-      it needs a way to know the order of the words. Positional encodings are small signals added to each
-      word that tell the model: "this word is first", "this word is second", and so on.
+      One critical challenge with abandoning recurrence is that the model loses any inherent sense of
+      token order. The authors addressed this with <strong>Positional Encodings</strong>, injecting
+      fixed sinusoidal signals into the token embeddings before the first layer. These encodings
+      allow the model to reason about absolute and relative positions without requiring sequential
+      computation:
+    </p>
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #0062A3;">
+      PE(pos, 2i) = sin(pos / 10000<sup>2i/d</sup>) &nbsp;&nbsp;&nbsp;
+      PE(pos, 2i+1) = cos(pos / 10000<sup>2i/d</sup>)
+    </p>
+    <p>
+      The full architecture stacks N=6 identical layers in both encoder and decoder. Each layer
+      contains a multi-head self-attention sublayer and a position-wise feed-forward network,
+      with residual connections and layer normalization around each sublayer.
     </p>
 
     <h2>Key Findings</h2>
     <ul>
-      <li>Every word can look at every other word at the same time. No waiting, no forgetting.</li>
-      <li>Multi-head attention lets the model learn many different things about words all at once.</li>
-      <li>Positional encodings give the model a sense of word order without needing to go step by step.</li>
-      <li>The whole model can run in parallel on a GPU, which makes training much faster.</li>
-      <li>It beat the best existing models on language translation tasks, and it did so faster and with less computing power.</li>
-      <li>The design is clean and simple. No complicated memory tricks, no step-by-step reading.</li>
+      <li>Full sequence parallelization during training, eliminating the sequential bottleneck that constrained RNN-based architectures.</li>
+      <li>Constant path length between any two positions in the sequence (O(1) operations), versus O(n) for RNNs - resolving the long-range dependency problem structurally, not through workarounds.</li>
+      <li>Multi-head attention enables the model to jointly attend to information from different representation subspaces, with each head learning distinct linguistic relationships.</li>
+      <li>The design is interpretable: attention weight distributions can be visualized and often correspond to meaningful syntactic and semantic structure in the input.</li>
+      <li>The architecture generalizes beyond translation - the authors demonstrated strong results on English constituency parsing with minimal task-specific adaptation.</li>
     </ul>
 
-    <h2>How Well Did It Work?</h2>
+    <h2>Results</h2>
     <p>
-      The researchers tested their model on two big translation tasks: English to German and English to French.
-      Their Transformer model did better than all the older models on both tasks. And it trained in a fraction
-      of the time. One version took only 12 hours to train on 8 GPUs. The older models took days.
-    </p>
-    <p>
-      This was a huge deal. Better results, faster training, simpler design. It was hard to argue against it.
-    </p>
-
-    <h2>Why Does This Matter for AI and Automation?</h2>
-    <p>
-      This paper is the foundation of almost every powerful AI model you hear about today.
+      The authors benchmarked on the WMT 2014 translation datasets, the standard evaluation at the time.
+      The results were decisive:
     </p>
     <ul>
-      <li><strong>GPT-4</strong> (the model behind ChatGPT) is built on Transformers.</li>
-      <li><strong>Claude</strong> (the AI you might be talking to right now) is built on Transformers.</li>
-      <li><strong>Gemini</strong> (Google's AI) is built on Transformers.</li>
-      <li><strong>BERT</strong> (used in Google Search) is built on Transformers.</li>
-      <li><strong>Llama</strong> (Meta's open-source AI) is built on Transformers.</li>
+      <li>
+        <strong>English-to-German:</strong> The big Transformer achieved a BLEU score of <strong>28.4</strong>,
+        surpassing all previously reported models including ensembles, at a fraction of the training cost.
+      </li>
+      <li>
+        <strong>English-to-French:</strong> BLEU score of <strong>41.0</strong>, a new state-of-the-art
+        at the time, trained for only 3.5 days on 8 NVIDIA P100 GPUs.
+      </li>
     </ul>
     <p>
-      If you work in AI, data science, or automation, you will run into Transformers everywhere.
-      Document processing, chatbots, code generation, data extraction, summarization. All of it
-      is powered by the same core idea from this 2017 paper.
+      For context, prior state-of-the-art systems required significantly more training compute and
+      complex engineering. The Transformer base model trained in 12 hours. The improvements were not
+      marginal - they represented a step change in what was achievable with a cleaner design.
     </p>
+
+    <h2>Why This Matters for AI and Automation</h2>
     <p>
-      Understanding how Transformers work is not just academic. It helps you make better decisions
-      when building AI systems. You will know why certain models are good at certain tasks,
-      why longer inputs cost more to process, and why fine-tuning works the way it does.
+      The Transformer did not just win a translation benchmark. It became the universal backbone of
+      modern AI. The reason is architectural flexibility: unlike RNNs, Transformers scale cleanly
+      with data and compute. As hardware improved, the architecture scaled with it.
+    </p>
+    <ul>
+      <li><strong>GPT series (OpenAI)</strong> - decoder-only Transformer, scaled to hundreds of billions of parameters.</li>
+      <li><strong>BERT (Google)</strong> - encoder-only Transformer, transformed information retrieval and search.</li>
+      <li><strong>Claude (Anthropic)</strong> - Constitutional AI training applied to a Transformer base.</li>
+      <li><strong>Gemini (Google DeepMind)</strong> - multimodal Transformer architecture.</li>
+      <li><strong>Llama (Meta)</strong> - open-weight Transformer powering the open-source AI ecosystem.</li>
+      <li><strong>Whisper, DALL-E, Stable Diffusion</strong> - audio transcription and image generation, all built on attention mechanisms derived from this paper.</li>
+    </ul>
+    <p>
+      For practitioners in AI and automation, understanding the Transformer is not optional background
+      knowledge - it is foundational. It explains why context window length directly affects cost
+      (attention scales quadratically with sequence length, O(n<sup>2</sup>)). It explains why
+      fine-tuning works the way it does, why RAG architectures are structured as they are, and why
+      certain tasks that require long-range reasoning remain challenging even for frontier models.
     </p>
 
     <h2>My Take</h2>
     <p>
-      What I find most interesting about this paper is how simple the core idea really is.
-      The researchers did not invent a complex new type of memory. They did not add more layers
-      of complicated logic. They just said: let everything talk to everything else at once.
-      That's it.
+      What makes this paper remarkable is not just the technical contribution - it is the restraint
+      in the design. Vaswani et al. did not add complexity; they removed it. They eliminated recurrence,
+      eliminated convolution, and showed that a clean attention-based architecture could outperform
+      systems that had been engineered and tuned for years.
     </p>
     <p>
-      The title of the paper, "Attention Is All You Need", is almost a bold statement.
-      They are saying: you do not need the old complicated methods. Just use attention.
-      And they were right.
+      The title "Attention Is All You Need" reads like a provocation. It was. The field had been
+      treating attention as a useful supplement to RNNs. This paper argued it was the whole thing.
+      Looking at the landscape of AI in 2026, nearly a decade later, that argument has held up
+      completely.
     </p>
     <p>
-      It is a good reminder that the best solutions are often not the most complicated ones.
-      Sometimes a clean, simple idea beats years of incremental improvements on old methods.
+      What I keep returning to is the quadratic complexity issue. The authors knew attention scales
+      as O(n<sup>2</sup>) in both time and memory. They accepted that trade-off because the
+      representational power was worth it at the sequence lengths they were targeting. The entire
+      research thread around efficient attention - Longformer, FlashAttention, linear attention
+      variants - exists because of this single architectural decision made in 2017. One trade-off
+      in a paper spawned years of follow-on research.
     </p>
     <p>
-      The fact that this paper from 2017 still sits at the core of the most advanced AI systems
-      in 2026 says everything about how big this idea was.
+      That is the mark of a genuinely foundational paper: not just that it solved the problem it
+      set out to solve, but that it defined the constraints and trade-offs that the field is still
+      working within.
     </p>
 
     <p>
-      <strong>Discussion question:</strong> With new architectures like Mamba, MoE models, and State Space Models
-      gaining ground, do you think the pure Transformer will still be the dominant architecture in 5 years?
-      Or is something better already on its way? Share your thoughts below.
+      <strong>Discussion question:</strong> With architectures like Mamba, RWKV, and State Space Models
+      offering linear-complexity alternatives to full attention, and MoE models changing how we think
+      about parameter efficiency, do you believe the quadratic attention bottleneck will ultimately
+      force a transition away from pure Transformers at scale - or will engineering solutions like
+      FlashAttention and sparse attention keep the architecture dominant for the next decade?
     </p>
 
   </div>
