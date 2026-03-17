@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <meta name="description" content="You do not need a cloud subscription to run a personal AI assistant 24/7. Here is how a $17 PicoClaw board, an SSD card, and an old power adapter became my always-on automation engine."/>
   <meta property="og:title" content="$17 and Always-On: Running PicoClaw on Cheap Hardware · AI & Automation Chronicle"/>
-  <meta property="og:description" content="Under 10MB RAM, 1-second boot, and a one-time $17 board cost. A practical look at PicoClaw and why the hybrid PicoClaw + ClawdBot setup is the real sweet spot."/>
+  <meta property="og:description" content="Under 10MB RAM, 1-second boot, and a one-time $17 board cost. A practical look at PicoClaw and why the hybrid PicoClaw + OpenClaw setup is the real sweet spot."/>
   <meta property="og:type" content="article"/>
   <title>Article 02 · $17 and Always-On: Running PicoClaw on Cheap Hardware · AI & Automation Chronicle</title>
   <link rel="stylesheet" href="../assets/css/style.css"/>
@@ -295,26 +295,26 @@
       <p class="photo-caption">The PicoClaw board powered on and running. Small enough to sit in your palm. The green LED confirms it is live and connected.</p>
     </div>
 
-    <h2>Start with ClawdBot</h2>
+    <h2>Start with OpenClaw</h2>
     <p>
-      If you are new to this category of tooling, <strong>ClawdBot</strong> is the right starting point.
+      If you are new to this category of tooling, <strong>OpenClaw</strong> is the right starting point.
       It is the full-featured, managed option in this space: higher compute ceiling, complex pipeline support,
       managed infrastructure, and a broader feature set out of the box.
     </p>
     <p>
-      Starting with ClawdBot gives you a clear picture of the workflow model before you commit to hardware.
+      Starting with OpenClaw gives you a clear picture of the workflow model before you commit to hardware.
       You learn what triggers, channels, and automation patterns actually matter for your use case. Once
       you know exactly what you need running persistently day-to-day, the decision to move to PicoClaw
       becomes straightforward.
     </p>
     <p>
-      PicoClaw is not a replacement for ClawdBot. It is the stripped-down, hardware-optimized path for
+      PicoClaw is not a replacement for OpenClaw. It is the stripped-down, hardware-optimized path for
       when you know your workload and want to run it at minimum cost and footprint.
     </p>
 
     <div class="compare-grid">
       <div class="compare-col old">
-        <h4>ClawdBot</h4>
+        <h4>OpenClaw</h4>
         <ul>
           <li>Best for getting started and prototyping</li>
           <li>Full feature set out of the box</li>
@@ -329,7 +329,7 @@
         <ul>
           <li>Always-on, 24/7 persistent execution</li>
           <li>$17 board - one-time hardware cost</li>
-          <li>Under 10MB RAM - 99% smaller than ClawdBot</li>
+          <li>Under 10MB RAM - 99% smaller than OpenClaw</li>
           <li>1-second boot on 0.6GHz single core</li>
           <li>SSH access from any terminal</li>
           <li>No infrastructure overhead - API costs only</li>
@@ -365,7 +365,7 @@
     </p>
     <p>
       The cost advantage is purely on the infrastructure side. API calls cost the same here as they
-      would on ClawdBot or any other platform. What you eliminate is the hosting overhead.
+      would on OpenClaw or any other platform. What you eliminate is the hosting overhead.
     </p>
 
     <!-- DIAGRAM: Setup Architecture -->
@@ -469,14 +469,14 @@
       <p class="photo-caption">The full setup - SSD card installed, power and data cables connected. The GPIO pins and compact form factor are visible here. The entire thing sits in a corner and runs indefinitely.</p>
     </div>
 
-    <h2>PicoClaw vs ClawdBot - Choosing the Right Tool</h2>
+    <h2>PicoClaw vs OpenClaw - Choosing the Right Tool</h2>
     <p>
       After running both, the decision framework is straightforward:
     </p>
 
     <div class="tier-grid">
       <div class="tier-col">
-        <h4>ClawdBot</h4>
+        <h4>OpenClaw</h4>
         <div class="tier-price">Cloud</div>
         <ul>
           <li>Best starting point for new users</li>
@@ -492,7 +492,7 @@
         <div class="tier-price">$17</div>
         <ul>
           <li>Always-on, 24/7 persistent execution</li>
-          <li>Under 10MB RAM - 99% smaller than ClawdBot</li>
+          <li>Under 10MB RAM - 99% smaller than OpenClaw</li>
           <li>1-second boot on minimal hardware</li>
           <li>SSH-accessible, no dashboard required</li>
           <li>Messaging, utilities, scheduled tasks</li>
@@ -505,13 +505,13 @@
     <h2>The Hybrid Stack</h2>
     <p>
       Running PicoClaw alone covers the persistent baseline effectively. But the most capable setup
-      is using both together. PicoClaw handles the always-on lightweight workload. ClawdBot handles
+      is using both together. PicoClaw handles the always-on lightweight workload. OpenClaw handles
       anything that requires cloud-scale compute or complex pipeline execution. The division of labor
       looks like this:
     </p>
 
     <div class="diagram-wrap">
-      <div class="diagram-title">Hybrid Automation Stack - PicoClaw + ClawdBot</div>
+      <div class="diagram-title">Hybrid Automation Stack - PicoClaw + OpenClaw</div>
       <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" width="700" height="260">
         <defs>
           <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
@@ -571,20 +571,20 @@
         <text x="608" y="136" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#86efac" font-weight="700">HYBRID STACK</text>
         <text x="608" y="153" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">Best coverage at lowest</text>
         <text x="608" y="168" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">possible infrastructure cost</text>
-        <text x="608" y="182" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#4ade80">PicoClaw + ClawdBot</text>
+        <text x="608" y="182" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#4ade80">PicoClaw + OpenClaw</text>
 
-        <text x="350" y="248" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#4b5563" font-style="italic">PicoClaw owns the persistent baseline - ClawdBot handles scale when the task demands it</text>
+        <text x="350" y="248" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#4b5563" font-style="italic">PicoClaw owns the persistent baseline - OpenClaw handles scale when the task demands it</text>
       </svg>
     </div>
 
     <h2>Key Findings</h2>
     <ul>
       <li><strong>Under 10MB RAM</strong> means PicoClaw runs on hardware nobody else would consider for this use case. A $17 board with an old power adapter is a fully functional AI assistant runtime.</li>
-      <li><strong>1-second boot on a 0.6GHz single core</strong> is 400x faster than ClawdBot startup. For persistent tasks this matters less, but it makes iteration and recovery fast.</li>
+      <li><strong>1-second boot on a 0.6GHz single core</strong> is 400x faster than OpenClaw startup. For persistent tasks this matters less, but it makes iteration and recovery fast.</li>
       <li><strong>API call costs are identical</strong> to any cloud setup. The saving is purely on infrastructure - no hosting fee, no subscription layer on top of compute costs.</li>
       <li><strong>Messaging automation runs reliably at this footprint.</strong> Telegram, Discord, WhatsApp, Matrix, and others work continuously without issues on the current setup.</li>
       <li><strong>SSD card + old power adapter + $17 board</strong> is a complete, production-grade runtime for basic persistent automation tasks.</li>
-      <li><strong>The hybrid model is the practical optimum.</strong> PicoClaw for the always-on baseline, ClawdBot for workloads that genuinely require cloud scale.</li>
+      <li><strong>The hybrid model is the practical optimum.</strong> PicoClaw for the always-on baseline, OpenClaw for workloads that genuinely require cloud scale.</li>
     </ul>
 
     <div class="callout green">
@@ -615,7 +615,7 @@
       <strong>The practical risk:</strong> Over-engineering infrastructure for lightweight tasks creates
       recurring cost, vendor dependency, and unnecessary complexity. Match the infrastructure to the
       actual requirements of the workload. For always-on, low-footprint tasks, PicoClaw is the more
-      honest fit. Reserve ClawdBot for the work that actually needs it.
+      honest fit. Reserve OpenClaw for the work that actually needs it.
     </div>
 
     <h2>My Take</h2>
@@ -630,13 +630,13 @@
       The uptime is as good as your power source, which in my case is an adapter I had in a drawer.
     </p>
     <p>
-      The starting point I would recommend is ClawdBot. It gives you the full picture of the ecosystem,
+      The starting point I would recommend is OpenClaw. It gives you the full picture of the ecosystem,
       teaches you the workflow model, and lets you identify exactly what you need running persistently.
       Then, once you know your workload, move the lightweight persistent tasks to a PicoClaw board.
-      Keep ClawdBot available for the heavy lifting.
+      Keep OpenClaw available for the heavy lifting.
     </p>
     <p>
-      <strong>That hybrid combination - PicoClaw handling the always-on baseline, ClawdBot available
+      <strong>That hybrid combination - PicoClaw handling the always-on baseline, OpenClaw available
       for scale - is the most cost-efficient and capable automation setup I have run.</strong>
     </p>
 
