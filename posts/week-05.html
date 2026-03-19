@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="The Agentic Development Cycle is reshaping how software gets built. Here is what actually changes when AI agents plan, code, test, and debug - and what stays firmly in human hands."/>
+  <meta property="og:title" content="The Agentic Development Cycle · AI & Automation Chronicle"/>
+  <meta property="og:description" content="AI agents do not just autocomplete code. They run a full observe-plan-act-reflect loop. Here is the new development cycle and what it means for how you build."/>
+  <meta property="og:type" content="article"/>
+  <title>Article 03 · The Agentic Development Cycle · AI & Automation Chronicle</title>
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    /* ── Diagram base ── */
+    .diagram-wrap {
+      margin: 2.5rem 0;
+      background: #0f1117;
+      border: 1px solid #1e2230;
+      border-radius: 16px;
+      padding: 2rem 1.5rem;
+      overflow-x: auto;
+    }
+    .diagram-wrap .diagram-title {
+      text-align: center;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #6b7280;
+      margin-bottom: 1.5rem;
+    }
+    .diagram-wrap svg {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+    }
+
+    /* ── Comparison table ── */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    @media (max-width: 600px) { .compare-grid { grid-template-columns: 1fr; } }
+    .compare-col {
+      border-radius: 14px;
+      padding: 1.4rem 1.2rem;
+    }
+    .compare-col.old {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+    }
+    .compare-col.new {
+      background: #0b1e2d;
+      border: 1px solid #1a3a5c;
+    }
+    .compare-col h4 {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.9rem;
+    }
+    .compare-col.old h4 { color: #6b7280; }
+    .compare-col.new h4 { color: #38bdf8; }
+    .compare-col ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .compare-col ul li {
+      font-size: 0.9rem;
+      color: #9ca3af;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .compare-col ul li:last-child { border-bottom: none; }
+    .compare-col.old ul li::before { content: "✕"; color: #ef4444; font-size: 0.75rem; margin-top: 2px; flex-shrink: 0; }
+    .compare-col.new ul li::before { content: "✓"; color: #22c55e; font-size: 0.75rem; margin-top: 2px; flex-shrink: 0; }
+
+    /* ── Callout box ── */
+    .callout {
+      border-left: 4px solid #3b82f6;
+      background: #0d1b2a;
+      border-radius: 0 12px 12px 0;
+      padding: 1rem 1.2rem;
+      margin: 1.8rem 0;
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      line-height: 1.65;
+    }
+    .callout.green { border-color: #22c55e; background: #0a1f14; }
+    .callout.orange { border-color: #f97316; background: #1c1208; }
+    .callout strong { color: #f8fafc; }
+
+    /* ── Feature pill list ── */
+    .feature-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin: 1.4rem 0;
+    }
+    .pill {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 999px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+    .pill.blue   { border-color: #1d4ed8; color: #93c5fd; background: #0c1a3a; }
+    .pill.green  { border-color: #15803d; color: #86efac; background: #052e16; }
+    .pill.purple { border-color: #7e22ce; color: #d8b4fe; background: #1e0a3a; }
+    .pill.orange { border-color: #c2410c; color: #fdba74; background: #2d1200; }
+
+    /* ── Stat highlight boxes ── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    @media (max-width: 560px) { .stat-row { grid-template-columns: 1fr 1fr; } }
+    .stat-box {
+      background: #0f1117;
+      border: 1px solid #1e2230;
+      border-radius: 14px;
+      padding: 1.2rem 1rem;
+      text-align: center;
+    }
+    .stat-box .stat-num {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #38bdf8;
+      line-height: 1;
+    }
+    .stat-box .stat-lbl {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.35rem;
+      font-weight: 500;
+    }
+
+    /* ── Loop step row ── */
+    .loop-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.8rem;
+      margin: 2rem 0;
+    }
+    @media (max-width: 640px) { .loop-steps { grid-template-columns: 1fr 1fr; } }
+    .loop-step {
+      border-radius: 12px;
+      padding: 1.1rem 1rem;
+      text-align: center;
+    }
+    .loop-step .step-icon {
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+    .loop-step .step-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+    .loop-step .step-desc {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      line-height: 1.45;
+    }
+    .loop-step.observe  { background: #071828; border: 1px solid #1d4ed8; }
+    .loop-step.observe .step-label { color: #60a5fa; }
+    .loop-step.plan     { background: #1c0a3a; border: 1px solid #7e22ce; }
+    .loop-step.plan .step-label    { color: #c084fc; }
+    .loop-step.act      { background: #0a1f14; border: 1px solid #15803d; }
+    .loop-step.act .step-label     { color: #4ade80; }
+    .loop-step.reflect  { background: #1c1208; border: 1px solid #c2410c; }
+    .loop-step.reflect .step-label { color: #fb923c; }
+  </style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SWMR2ZGHJE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-SWMR2ZGHJE');
+  </script>
+</head>
+<body>
+
+  <!-- READING PROGRESS BAR -->
+  <div id="progress-bar"></div>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="../index.html" class="nav-brand">AI & <span>Automation</span> Chronicle</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <div class="breadcrumb-inner">
+      <a href="../index.html">Home</a>
+      <span class="breadcrumb-sep">&#8250;</span>
+      <span class="breadcrumb-current">Article 03 &middot; The Agentic Development Cycle</span>
+    </div>
+  </div>
+
+  <!-- POST HEADER -->
+  <div class="post-header">
+    <div class="post-header-inner">
+      <span class="post-week">Article 03 &middot; March 2026</span>
+      <h1>The Agentic Development Cycle - How AI Agents Actually Build Software</h1>
+      <div class="post-header-meta">
+        <span>March 19, 2026 &middot; by Satish K C</span>
+        <span>11 min read</span>
+      </div>
+      <div class="post-header-tags">
+        <span class="tag orange">Agents</span>
+        <span class="tag green">Automation</span>
+        <span class="tag purple">LLMs</span>
+        <span class="tag">Engineering</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- POST BODY -->
+  <div class="post-body">
+
+    <h2>The Big Idea</h2>
+    <p>
+      For three decades, writing software meant a human at a keyboard translating intent into syntax -
+      one function, one file, one pull request at a time. The entire toolchain - IDEs, linters, debuggers,
+      CI pipelines - was built around augmenting that human loop, not replacing it.
+    </p>
+    <p>
+      That model is being structurally renegotiated. Not because LLMs write good code (they often do),
+      but because of something more fundamental: <strong>AI agents can now run the development loop itself.</strong>
+      They read files, execute commands, observe outputs, form hypotheses, revise code, and re-test -
+      iterating without a human intervening at each step.
+    </p>
+    <p>
+      This is the agentic development cycle. It is not faster autocomplete. It is a different unit of work.
+      The shift is from "AI helps me write code" to "AI runs the implementation loop while I direct the outcome."
+    </p>
+
+    <div class="callout">
+      <strong>The key distinction:</strong> Traditional coding assistants (early Copilot, ChatGPT) operate
+      in a single-turn pattern - you ask, it answers, you copy. Agentic systems operate in a multi-step
+      loop - observe environment, plan action, execute tool, read result, adjust. The loop does not stop
+      until the goal is met or the agent is blocked.
+    </div>
+
+    <!-- DIAGRAM 1: Old vs New Development Cycle -->
+    <h2>Before vs After - Where the Loop Lives</h2>
+    <p>
+      The clearest way to see the shift is to map where cognitive work sits in the traditional cycle
+      versus the agentic one. The work does not disappear - it relocates.
+    </p>
+
+    <div class="diagram-wrap">
+      <div class="diagram-title">Development Cycle - Traditional vs Agentic</div>
+      <svg viewBox="0 0 740 300" xmlns="http://www.w3.org/2000/svg" width="740" height="300">
+        <defs>
+          <marker id="arr-gray" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#4b5563"/>
+          </marker>
+          <marker id="arr-cyan" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#38bdf8"/>
+          </marker>
+          <linearGradient id="oldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#1f2937"/>
+            <stop offset="100%" style="stop-color:#111827"/>
+          </linearGradient>
+          <linearGradient id="newGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#071e3d"/>
+            <stop offset="100%" style="stop-color:#04101e"/>
+          </linearGradient>
+        </defs>
+
+        <!-- TRADITIONAL label -->
+        <text x="20" y="18" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#6b7280" letter-spacing="2">TRADITIONAL CYCLE</text>
+
+        <!-- Traditional steps: horizontal chain -->
+        <!-- Step nodes -->
+        <rect x="10"  y="28" width="84" height="48" rx="8" fill="url(#oldGrad)" stroke="#374151" stroke-width="1"/>
+        <text x="52"  y="49" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#9ca3af">HUMAN WRITES</text>
+        <text x="52"  y="63" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">spec + design</text>
+
+        <line x1="94" y1="52" x2="114" y2="52" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arr-gray)"/>
+
+        <rect x="114" y="28" width="84" height="48" rx="8" fill="url(#oldGrad)" stroke="#374151" stroke-width="1"/>
+        <text x="156" y="49" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#9ca3af">HUMAN CODES</text>
+        <text x="156" y="63" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">line by line</text>
+
+        <line x1="198" y1="52" x2="218" y2="52" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arr-gray)"/>
+
+        <rect x="218" y="28" width="84" height="48" rx="8" fill="url(#oldGrad)" stroke="#374151" stroke-width="1"/>
+        <text x="260" y="49" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#9ca3af">HUMAN TESTS</text>
+        <text x="260" y="63" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">runs + reads errors</text>
+
+        <line x1="302" y1="52" x2="322" y2="52" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arr-gray)"/>
+
+        <rect x="322" y="28" width="84" height="48" rx="8" fill="url(#oldGrad)" stroke="#374151" stroke-width="1"/>
+        <text x="364" y="49" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#9ca3af">HUMAN DEBUGS</text>
+        <text x="364" y="63" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">traces + fixes</text>
+
+        <line x1="406" y1="52" x2="426" y2="52" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arr-gray)"/>
+
+        <rect x="426" y="28" width="84" height="48" rx="8" fill="url(#oldGrad)" stroke="#374151" stroke-width="1"/>
+        <text x="468" y="49" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#9ca3af">HUMAN REVIEWS</text>
+        <text x="468" y="63" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">PR + merge</text>
+
+        <line x1="510" y1="52" x2="530" y2="52" stroke="#4b5563" stroke-width="1.5" marker-end="url(#arr-gray)"/>
+
+        <rect x="530" y="28" width="84" height="48" rx="8" fill="url(#oldGrad)" stroke="#374151" stroke-width="1"/>
+        <text x="572" y="49" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#9ca3af">DEPLOY</text>
+        <text x="572" y="63" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280">ship it</text>
+
+        <!-- all-human label -->
+        <rect x="10" y="84" width="604" height="16" rx="4" fill="#1f2937" opacity="0.6"/>
+        <text x="312" y="96" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#6b7280" letter-spacing="1">ALL STEPS ARE HUMAN COGNITIVE WORK</text>
+
+        <!-- Divider -->
+        <line x1="10" y1="118" x2="730" y2="118" stroke="#1f2937" stroke-width="1" stroke-dasharray="6,4"/>
+
+        <!-- AGENTIC label -->
+        <text x="20" y="138" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#38bdf8" letter-spacing="2">AGENTIC CYCLE</text>
+
+        <!-- Agentic: human goal, then agent loop, then human review -->
+
+        <!-- Human: sets goal -->
+        <rect x="10" y="148" width="84" height="52" rx="8" fill="#071e3d" stroke="#1e40af" stroke-width="1.5"/>
+        <text x="52" y="168" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#60a5fa">HUMAN</text>
+        <text x="52" y="181" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#38bdf8">sets goal +</text>
+        <text x="52" y="192" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#38bdf8">constraints</text>
+
+        <line x1="94" y1="174" x2="114" y2="174" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arr-cyan)"/>
+
+        <!-- Agent loop box -->
+        <rect x="114" y="140" width="376" height="68" rx="10" fill="#04101e" stroke="#38bdf8" stroke-width="1.5"/>
+        <text x="302" y="156" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#38bdf8" letter-spacing="1.5">AGENT LOOP (RUNS AUTONOMOUSLY)</text>
+
+        <!-- loop sub-steps -->
+        <rect x="122" y="162" width="64" height="36" rx="6" fill="#071828" stroke="#1d4ed8" stroke-width="1"/>
+        <text x="154" y="177" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#60a5fa">PLANS</text>
+        <text x="154" y="189" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#4b5563">decomposes task</text>
+
+        <line x1="186" y1="180" x2="202" y2="180" stroke="#38bdf8" stroke-width="1" marker-end="url(#arr-cyan)"/>
+
+        <rect x="202" y="162" width="64" height="36" rx="6" fill="#052e16" stroke="#15803d" stroke-width="1"/>
+        <text x="234" y="177" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#4ade80">CODES</text>
+        <text x="234" y="189" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#4b5563">reads + writes files</text>
+
+        <line x1="266" y1="180" x2="282" y2="180" stroke="#38bdf8" stroke-width="1" marker-end="url(#arr-cyan)"/>
+
+        <rect x="282" y="162" width="64" height="36" rx="6" fill="#1c1208" stroke="#c2410c" stroke-width="1"/>
+        <text x="314" y="177" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#fb923c">TESTS</text>
+        <text x="314" y="189" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#4b5563">runs bash + reads</text>
+
+        <line x1="346" y1="180" x2="362" y2="180" stroke="#38bdf8" stroke-width="1" marker-end="url(#arr-cyan)"/>
+
+        <rect x="362" y="162" width="64" height="36" rx="6" fill="#1c0a3a" stroke="#7e22ce" stroke-width="1"/>
+        <text x="394" y="177" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#c084fc">REFLECTS</text>
+        <text x="394" y="189" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#4b5563">revises + retries</text>
+
+        <!-- loop-back arrow -->
+        <path d="M426,180 C450,180 450,215 302,215 C154,215 114,215 114,198" fill="none" stroke="#38bdf8" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arr-cyan)"/>
+        <text x="302" y="229" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#4b5563" letter-spacing="0.5">loop repeats until goal is met or agent is blocked</text>
+
+        <line x1="490" y1="174" x2="510" y2="174" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#arr-cyan)"/>
+
+        <!-- Human: reviews + ships -->
+        <rect x="510" y="148" width="84" height="52" rx="8" fill="#071e3d" stroke="#1e40af" stroke-width="1.5"/>
+        <text x="552" y="168" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#60a5fa">HUMAN</text>
+        <text x="552" y="181" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#38bdf8">reviews output</text>
+        <text x="552" y="192" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#38bdf8">+ ships</text>
+
+        <!-- caption row -->
+        <rect x="114" y="240" width="376" height="16" rx="4" fill="#071828" opacity="0.8"/>
+        <text x="302" y="252" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#38bdf8" letter-spacing="0.8">AGENT HANDLES: plan, code, test, debug, iterate - all tool-mediated</text>
+      </svg>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-col old">
+        <h4>Traditional Development</h4>
+        <ul>
+          <li>Human writes every line of implementation</li>
+          <li>Debugging requires reading and reasoning manually</li>
+          <li>Each iteration needs human re-engagement</li>
+          <li>Context lives in the developer's head</li>
+          <li>Bottleneck: how fast the human can type and think</li>
+          <li>Cost scales with developer hours</li>
+        </ul>
+      </div>
+      <div class="compare-col new">
+        <h4>Agentic Development</h4>
+        <ul>
+          <li>Agent writes implementation from goal + constraints</li>
+          <li>Agent reads errors, forms hypothesis, fixes autonomously</li>
+          <li>Loop runs without human re-engagement per step</li>
+          <li>Context lives in tool call history + scratch files</li>
+          <li>Bottleneck: quality of goal specification</li>
+          <li>Cost scales with token usage, not developer hours</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- DIAGRAM 2: The Observe-Plan-Act-Reflect Loop -->
+    <h2>How It Works - The Observe-Plan-Act-Reflect Loop</h2>
+    <p>
+      At the core of every agentic system - Claude Code, Aider, Devin, Cursor Agent, GitHub Copilot Workspace -
+      is the same underlying control loop. The names differ but the structure is consistent.
+    </p>
+
+    <div class="loop-steps">
+      <div class="loop-step observe">
+        <div class="step-icon">&#128065;</div>
+        <div class="step-label">Observe</div>
+        <div class="step-desc">Read the codebase, file tree, error output, or test results. Build a model of current state.</div>
+      </div>
+      <div class="loop-step plan">
+        <div class="step-icon">&#128196;</div>
+        <div class="step-label">Plan</div>
+        <div class="step-desc">Decompose the goal into discrete sub-tasks. Identify which files to read, which to edit, what commands to run.</div>
+      </div>
+      <div class="loop-step act">
+        <div class="step-icon">&#9881;</div>
+        <div class="step-label">Act</div>
+        <div class="step-desc">Execute tool calls: read file, write file, run bash, search codebase, fetch URL. One concrete action per step.</div>
+      </div>
+      <div class="loop-step reflect">
+        <div class="step-icon">&#128260;</div>
+        <div class="step-label">Reflect</div>
+        <div class="step-desc">Read tool output. Did the action succeed? If not, revise the plan. If yes, move to the next sub-task.</div>
+      </div>
+    </div>
+
+    <p>
+      What makes this mechanically different from single-turn assistance is the <strong>tool call layer</strong>.
+      The agent does not just generate text - it calls structured functions with typed parameters:
+      <code>read_file(path)</code>, <code>write_file(path, content)</code>, <code>bash(command)</code>,
+      <code>grep(pattern, directory)</code>. The output of each tool call becomes the next observation
+      that feeds back into the loop.
+    </p>
+
+    <div class="callout green">
+      <strong>Why this matters architecturally:</strong> Tool calls give the agent access to ground truth.
+      Instead of hallucinating what a file contains, it reads the file. Instead of guessing whether a test
+      passes, it runs the test. The loop anchors the agent in real state rather than generated state -
+      which is what separates agentic systems from glorified autocomplete.
+    </div>
+
+    <!-- DIAGRAM 3: Tool Call Architecture -->
+    <h2>The Tool Call Architecture</h2>
+    <p>
+      The scaffolding layer is where the agentic cycle is actually implemented. Here is how
+      a modern coding agent like Claude Code is structured internally:
+    </p>
+
+    <div class="diagram-wrap">
+      <div class="diagram-title">Agentic Coding System - Internal Architecture</div>
+      <svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg" width="720" height="360">
+        <defs>
+          <marker id="a4" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#38bdf8"/>
+          </marker>
+          <marker id="a4-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#22c55e"/>
+          </marker>
+          <marker id="a4-purple" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#a78bfa"/>
+          </marker>
+        </defs>
+
+        <!-- Human Input -->
+        <rect x="10" y="20" width="130" height="52" rx="10" fill="#071828" stroke="#1d4ed8" stroke-width="1.5"/>
+        <text x="75" y="42" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#60a5fa">HUMAN GOAL</text>
+        <text x="75" y="58" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">"Add rate limiting to</text>
+        <text x="75" y="68" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">the /submit endpoint"</text>
+
+        <!-- Arrow right -->
+        <line x1="140" y1="46" x2="200" y2="46" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#a4)"/>
+
+        <!-- LLM Core -->
+        <rect x="200" y="10" width="150" height="72" rx="10" fill="#04101e" stroke="#38bdf8" stroke-width="2"/>
+        <text x="275" y="34" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#38bdf8">LLM CORE</text>
+        <text x="275" y="50" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#6b7280">Claude / GPT-4o / Gemini</text>
+        <text x="275" y="64" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">reasons over context window</text>
+        <text x="275" y="75" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">emits tool calls as structured JSON</text>
+
+        <!-- Arrow down from LLM to Tool Router -->
+        <line x1="275" y1="82" x2="275" y2="120" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#a4)"/>
+
+        <!-- Tool Router -->
+        <rect x="190" y="120" width="170" height="48" rx="10" fill="#071828" stroke="#1d4ed8" stroke-width="1"/>
+        <text x="275" y="140" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#93c5fd">TOOL ROUTER</text>
+        <text x="275" y="156" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">parses tool name + params, dispatches call</text>
+
+        <!-- Arrows from tool router to each tool -->
+        <line x1="240" y1="168" x2="120" y2="210" stroke="#38bdf8" stroke-width="1.2" marker-end="url(#a4)"/>
+        <line x1="260" y1="168" x2="200" y2="210" stroke="#22c55e" stroke-width="1.2" marker-end="url(#a4-green)"/>
+        <line x1="290" y1="168" x2="340" y2="210" stroke="#a78bfa" stroke-width="1.2" marker-end="url(#a4-purple)"/>
+        <line x1="310" y1="168" x2="440" y2="210" stroke="#fb923c" stroke-width="1.2" marker-end="url(#a4)"/>
+
+        <!-- Tool boxes -->
+        <rect x="50" y="210" width="110" height="52" rx="8" fill="#071828" stroke="#1d4ed8" stroke-width="1"/>
+        <text x="105" y="230" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#60a5fa">READ / WRITE</text>
+        <text x="105" y="244" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">file system access</text>
+        <text x="105" y="256" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">read, write, glob</text>
+
+        <rect x="170" y="210" width="110" height="52" rx="8" fill="#0a1f14" stroke="#15803d" stroke-width="1"/>
+        <text x="225" y="230" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#4ade80">BASH</text>
+        <text x="225" y="244" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">run tests, install deps</text>
+        <text x="225" y="256" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">execute any command</text>
+
+        <rect x="290" y="210" width="110" height="52" rx="8" fill="#1c0a3a" stroke="#7e22ce" stroke-width="1"/>
+        <text x="345" y="230" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#c084fc">SEARCH</text>
+        <text x="345" y="244" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">grep codebase</text>
+        <text x="345" y="256" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">find symbols + refs</text>
+
+        <rect x="410" y="210" width="110" height="52" rx="8" fill="#1c1208" stroke="#c2410c" stroke-width="1"/>
+        <text x="465" y="230" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#fb923c">WEB / API</text>
+        <text x="465" y="244" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">fetch docs, specs</text>
+        <text x="465" y="256" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">call external services</text>
+
+        <!-- Arrows back up: tool results return to LLM -->
+        <line x1="105" y1="262" x2="105" y2="300" stroke="#1f2937" stroke-width="1"/>
+        <line x1="225" y1="262" x2="225" y2="300" stroke="#1f2937" stroke-width="1"/>
+        <line x1="345" y1="262" x2="345" y2="300" stroke="#1f2937" stroke-width="1"/>
+        <line x1="465" y1="262" x2="465" y2="300" stroke="#1f2937" stroke-width="1"/>
+
+        <!-- Merge line at bottom -->
+        <line x1="105" y1="300" x2="465" y2="300" stroke="#1f2937" stroke-width="1"/>
+        <line x1="285" y1="300" x2="285" y2="320" stroke="#38bdf8" stroke-width="1.5" marker-end="url(#a4)"/>
+
+        <!-- Context Window box -->
+        <rect x="160" y="320" width="250" height="34" rx="8" fill="#04101e" stroke="#38bdf8" stroke-width="1.5"/>
+        <text x="285" y="335" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#38bdf8">CONTEXT WINDOW (AGENT MEMORY)</text>
+        <text x="285" y="348" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">all tool results appended - LLM re-reads on next turn</text>
+
+        <!-- Return arrow from context back to LLM -->
+        <path d="M620,336 C660,336 680,280 680,46 C680,20 640,20 590,20 C560,20 550,10 490,10 C460,10 420,10 350,10" fill="none" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="5,3" marker-end="url(#a4)"/>
+        <text x="670" y="200" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563" transform="rotate(90,670,200)">tool results fed back</text>
+
+        <!-- Permission Gate label -->
+        <rect x="580" y="120" width="130" height="48" rx="8" fill="#1c1208" stroke="#c2410c" stroke-width="1.5"/>
+        <text x="645" y="140" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#fb923c">PERMISSION GATE</text>
+        <text x="645" y="154" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">human approves risky</text>
+        <text x="645" y="165" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#4b5563">tool calls before exec</text>
+        <line x1="580" y1="144" x2="360" y2="144" stroke="#c2410c" stroke-width="1" stroke-dasharray="4,3"/>
+      </svg>
+    </div>
+
+    <p>
+      The permission gate is worth emphasizing. Production agentic systems - Claude Code being a direct example -
+      do not execute high-risk actions (bash commands that modify the filesystem, git pushes, destructive operations)
+      without surfacing them to the human for approval. This is not a UX nicety. It is a structural safety
+      mechanism that keeps the human in the loop at the right granularity - not for every file read, but for
+      every irreversible action.
+    </p>
+
+    <h2>Key Findings</h2>
+
+    <div class="feature-pills">
+      <span class="pill blue">Tool-grounded reasoning</span>
+      <span class="pill green">Multi-step loops</span>
+      <span class="pill purple">Context accumulation</span>
+      <span class="pill orange">Permission layering</span>
+      <span class="pill blue">Specification quality</span>
+    </div>
+
+    <ul>
+      <li>
+        <strong>Goal specification quality determines output quality.</strong> Vague prompts produce vague plans
+        which produce vague code. The agentic cycle amplifies specification quality in both directions -
+        a precise, constrained goal produces surprisingly good output; an ambiguous one compounds errors across
+        every loop iteration.
+      </li>
+      <li>
+        <strong>Agents degrade with context growth.</strong> As the context window fills with tool call history,
+        model attention diffuses. Tasks that require holding many simultaneous constraints - large refactors,
+        cross-file architectural changes - are where current agents most visibly fail. Scoped, bounded tasks
+        consistently outperform open-ended ones.
+      </li>
+      <li>
+        <strong>The bash tool is where real power lives.</strong> An agent that can execute shell commands can run
+        your test suite, install dependencies, build Docker images, query databases, and check git history.
+        The coding capability of an agent is therefore bounded by what it is permitted to execute -
+        not what it can generate.
+      </li>
+      <li>
+        <strong>Agents struggle with architectural judgment.</strong> They are excellent at mechanical
+        transformations: renaming, refactoring, adding error handling, writing tests for existing code.
+        They are much weaker at decisions that require understanding of non-local constraints - why a particular
+        data model was chosen, what technical debt is acceptable, where a boundary should sit.
+      </li>
+      <li>
+        <strong>Human-in-the-loop checkpoints matter more than people expect.</strong> The instinct is to
+        approve tool calls quickly to keep momentum. The actual failure mode is approving operations you did not
+        read carefully - especially git operations, file deletions, and test bypass flags.
+      </li>
+    </ul>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-num">4-6</div>
+        <div class="stat-lbl">average tool calls per agentic task completion in Claude Code sessions</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">~70%</div>
+        <div class="stat-lbl">of developer time is non-implementation work that agents can now absorb</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">1</div>
+        <div class="stat-lbl">new bottleneck: specification quality, not implementation speed</div>
+      </div>
+    </div>
+
+    <h2>Why This Matters for AI and Automation Practitioners</h2>
+    <p>
+      The agentic development cycle is not a feature you enable - it is a fundamentally different working model
+      that changes what skills matter, what failure modes to anticipate, and what "doing the work" means.
+    </p>
+    <p>
+      For automation practitioners specifically, this matters in two ways:
+    </p>
+    <ul>
+      <li>
+        <strong>You can now build things faster than you can specify them.</strong> The implementation bottleneck
+        has largely moved. A well-specified feature that would take a developer a day can take an agent
+        twenty minutes. The new constraint is writing specifications precise enough for the agent to execute
+        without requiring constant correction.
+      </li>
+      <li>
+        <strong>Agentic systems are themselves automation targets.</strong> If an agent can read a codebase,
+        run tests, and push to a branch, that is a pipeline - one you can trigger from n8n, a cron job,
+        a webhook, or a CI event. The combination of agentic coding and workflow automation is where
+        the most interesting compounding happens.
+      </li>
+    </ul>
+
+    <div class="callout green">
+      <strong>The emerging pattern:</strong> A practitioner who can write precise goal specifications,
+      understand the permission model of their agent, and compose agentic coding sessions into larger
+      automation pipelines is operating at a qualitatively different leverage point than one who is
+      still typing every function manually. The skill compound is: specification + direction + integration.
+    </div>
+
+    <div class="callout orange">
+      <strong>The risk:</strong> Agentic systems produce code that looks correct but lacks the architectural
+      reasoning that produces maintainable systems. Ghost functions, redundant abstractions, and non-idiomatic
+      patterns accumulate silently. The agent ships working code. Whether it is good code requires
+      a human who can read it critically - not just run the tests.
+    </div>
+
+    <h2>My Take</h2>
+    <p>
+      The framing of "AI replacing developers" is the wrong frame. The more accurate observation is that the
+      agentic development cycle raises the floor on what a single practitioner can build alone while shifting
+      the ceiling toward people who can think clearly about systems - not people who can type faster.
+    </p>
+    <p>
+      The bottleneck has genuinely moved. I have watched myself go from spending most of a session on
+      implementation to spending it on specification, review, and course correction. That is a material
+      change in how the work feels. It is also a harder skill to develop than people assume - writing
+      a goal that is precise enough for an agent to execute without accumulating errors across ten tool calls
+      is a real discipline.
+    </p>
+    <p>
+      What I find most interesting is not the raw capability but the permission model. Claude Code's approach -
+      auto-approve reads and searches, require approval for writes, require explicit approval for bash - maps
+      closely to how you would want any autonomous system operating in a shared environment. It is a design
+      pattern worth borrowing when you build your own agentic automation pipelines.
+    </p>
+    <p>
+      The agentic cycle is not the end state. Context windows will grow, memory architectures will mature,
+      and agents will become capable of longer-horizon tasks without degradation. But the current moment -
+      where scoped agentic loops work reliably and open-ended ones still need tight human steering -
+      is a genuinely productive place to be building.
+    </p>
+
+    <p>
+      <strong>Discussion question:</strong> As agentic development tools continue to mature,
+      does deep implementation knowledge become more or less valuable - and does the answer differ
+      depending on whether you are an individual practitioner, a team lead, or an engineering organization
+      making hiring decisions?
+    </p>
+
+  </div>
+
+  <!-- SHARE SECTION -->
+  <div class="share-section">
+    <h3>Share this discussion</h3>
+    <div class="share-buttons">
+      <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fsatishkc7.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-05.html&title=The%20Agentic%20Development%20Cycle"
+         target="_blank" rel="noopener" class="share-btn linkedin">
+        LinkedIn
+      </a>
+      <a href="https://twitter.com/intent/tweet?text=The%20Agentic%20Development%20Cycle%20-%20how%20AI%20agents%20actually%20build%20software&url=https%3A%2F%2Fsatishkc7.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-05.html"
+         target="_blank" rel="noopener" class="share-btn twitter">
+        X / Twitter
+      </a>
+      <button class="share-btn copy" id="copy-btn" onclick="
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          this.textContent = 'Copied!';
+          setTimeout(() => { this.textContent = 'Copy Link'; }, 2000);
+        });
+      ">
+        Copy Link
+      </button>
+    </div>
+  </div>
+
+  <!-- POST NAVIGATION -->
+  <div class="post-nav">
+    <a href="../index.html">&#8592; Back to all articles</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <a href="../about.html">About</a>
+      <a href="https://github.com/satishkc7" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://linkedin.com/in/satishkc7" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <p>&copy; 2026 AI &amp; Automation Chronicle &middot; Built by <a href="https://github.com/satishkc7" target="_blank" rel="noopener">Satish K C</a></p>
+  </footer>
+
+  <!-- READING PROGRESS SCRIPT -->
+  <script>
+    const bar = document.getElementById('progress-bar');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = docHeight > 0 ? (scrollTop / docHeight * 100) + '%' : '0%';
+    });
+  </script>
+
+</body>
+</html>
