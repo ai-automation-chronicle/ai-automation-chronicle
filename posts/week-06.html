@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="A deep dive into CausalMMM — a 2024 WSDM paper that automatically learns shop-specific causal structures from advertising data using variational inference and Granger causality, outperforming prior baselines by 5.7-7.1% AUROC."/>
+  <meta property="og:title" content="CausalMMM: Learning Causal Structure for Marketing Mix Modeling · AI & Automation Chronicle"/>
+  <meta property="og:description" content="Marketing attribution has always required pre-specifying causal relationships between channels. CausalMMM learns them automatically - and predicts GMV better than anything else on the benchmark."/>
+  <meta property="og:type" content="article"/>
+  <title>Week 03 · CausalMMM · AI &amp; Automation Chronicle</title>
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SWMR2ZGHJE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-SWMR2ZGHJE');
+  </script>
+</head>
+<body>
+
+  <!-- READING PROGRESS BAR -->
+  <div id="progress-bar"></div>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="../index.html" class="nav-brand">AI & <span>Automation</span> Chronicle</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <div class="breadcrumb-inner">
+      <a href="../index.html">Home</a>
+      <span class="breadcrumb-sep">&#8250;</span>
+      <span class="breadcrumb-current">Week 03 &middot; CausalMMM</span>
+    </div>
+  </div>
+
+  <!-- POST HEADER -->
+  <div class="post-header">
+    <div class="post-header-inner">
+      <span class="post-week">Week 03 &middot; March 2026</span>
+      <h1>CausalMMM: Learning Causal Structure for Marketing Mix Modeling</h1>
+      <div class="post-header-meta">
+        <span>March 21, 2026 &middot; by Satish K C</span>
+        <span>14 min read</span>
+      </div>
+      <div class="post-header-tags">
+        <span class="tag">Deep Learning</span>
+        <span class="tag green">Causal AI</span>
+        <span class="tag purple">Graph Learning</span>
+        <span class="tag orange">Optimization</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- POST BODY -->
+  <div class="post-body">
+
+    <h2>The Paper</h2>
+    <p>
+      <strong>"CausalMMM: Learning Causal Structure for Marketing Mix Modeling"</strong> was published
+      in 2024 by Chang Gong, Di Yao, Lei Zhang, Sheng Chen, Wenbin Li, Yueyang Su, and Jingping Bi,
+      all affiliated with the Institute of Computing Technology, Chinese Academy of Sciences and the
+      University of Chinese Academy of Sciences. It appeared at <strong>WSDM 2024</strong>, the ACM
+      International Conference on Web Search and Data Mining, one of the leading venues for applied
+      machine learning on large-scale commercial data.
+    </p>
+    <p>
+      The paper targets Marketing Mix Modeling (MMM) - the quantitative practice of attributing
+      sales outcomes to advertising channel investments. MMM underpins budget allocation decisions
+      at scale across e-commerce, retail, and brand advertising. The core problem: every prior
+      approach to causal MMM requires a human to pre-specify which advertising channels causally
+      affect which others. CausalMMM replaces that manual specification with a learned, data-driven
+      process that discovers shop-specific causal structures automatically while simultaneously
+      modeling the marketing response dynamics (carryover and saturation) that make advertising
+      attribution non-trivial.
+    </p>
+    <a href="https://arxiv.org/abs/2406.16728" target="_blank" rel="noopener" class="paper-link">
+      Read the Paper on arXiv &#8594;
+    </a>
+
+    <h2>The Problem Before This Paper</h2>
+    <p>
+      Marketing Mix Modeling as a discipline is decades old. Early MMM was purely regression-based:
+      fit a linear model from advertising spend to sales, read off the coefficients as attribution weights.
+      The obvious limitation is that regression does not distinguish correlation from causation, and
+      advertising channels frequently confound each other - a brand awareness TV campaign shifts the
+      baseline for search-click conversions in ways that regression cannot cleanly separate.
+    </p>
+    <p>
+      The causal MMM line of work addressed this by introducing Directed Acyclic Graphs (DAGs) over
+      advertising channels to model how spend on one channel influences outcomes through others.
+      But every prior causal MMM method shared a structural assumption: <strong>the causal graph is
+      pre-specified</strong>. A domain expert or analyst decides in advance that, say, TV causes
+      Search-Click and Search-Click causes GMV. The model then conditions on that graph.
+    </p>
+    <p>
+      This creates two compounding problems that practitioners building production MMM systems deal
+      with constantly:
+    </p>
+    <ul>
+      <li>
+        <strong>Pre-specified graphs are wrong, and wrongly-specified graphs degrade prediction.</strong>
+        The actual causal relationships between advertising channels differ by brand category, shop
+        maturity, seasonality, and competitive context. A graph built for a luxury cosmetics brand
+        does not transfer to a grocery shop on the same platform.
+      </li>
+      <li>
+        <strong>Causal heterogeneity across shops is not handled.</strong> An e-commerce platform
+        with thousands of brand shops cannot afford to manually specify a separate causal graph for
+        each one. Existing approaches either use a single shared graph (wrong) or require per-shop
+        manual specification (unscalable).
+      </li>
+    </ul>
+    <p>
+      Granger causality methods - including NGC, GVAR, and the attention-based InGRA - had been
+      developed for causal discovery in time series, but none of them incorporated marketing-specific
+      constraints such as the saturation effect (diminishing returns on ad spend) or carryover
+      (advertising effect that decays over time), which are structural features of how advertising
+      actually works. Applying those methods directly to marketing data produces causal structures
+      that are statistically valid but practically unreliable for budget allocation.
+    </p>
+
+    <h2>What They Built</h2>
+    <p>
+      CausalMMM is a variational inference framework with two coupled components: a
+      <strong>Causal Relational Encoder</strong> that discovers causal structures across advertising
+      channels, and a <strong>Marketing Response Decoder</strong> that predicts sales outcomes
+      while enforcing the saturation and carryover dynamics known to govern advertising response.
+    </p>
+    <p>
+      The problem is formally defined as follows. Given a marketing dataset with N shops, each with
+      advertising spend matrix <strong>X</strong><sub>n</sub> &isin; &real;<sup>T&times;d</sup>
+      (T time steps, d channels), target values <strong>y</strong><sub>n</sub> &isin; &real;<sup>T</sup>,
+      and contextual variables <strong>C</strong><sub>n</sub>, the model must simultaneously infer
+      shop-specific causal graphs {G<sub>1</sub>,...,G<sub>N</sub>} and predict future GMV. The
+      key formulation uses non-linear Granger causality: a channel x<sub>j</sub> Granger-causes
+      channel x<sub>i</sub> if access to the history of x<sub>j</sub> improves the prediction of
+      x<sub>i</sub> over using x<sub>i</sub>'s own history alone.
+    </p>
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #E04D14;">
+      x<sub>j</sub><sup>(t+1)</sup> = g<sub>j</sub>(x<sub>1</sub><sup>(1:t)</sup>, ..., x<sub>d</sub><sup>(1:t)</sup>) + &epsilon;<sub>j</sub><sup>(t+1)</sup>
+    </p>
+    <p>
+      The causal adjacency matrix is treated as a discrete latent variable z &isin; {0,1}<sup>d&times;d</sup>,
+      where z<sub>ij</sub>=1 indicates that channel i causally influences channel j. Because discrete
+      variables are not differentiable, the model uses <strong>Gumbel-Softmax sampling</strong>
+      to enable end-to-end gradient-based training:
+    </p>
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #0062A3;">
+      z<sub>ij</sub> ~ Softmax( (h<sub>ij</sub> + g) / &tau; )
+    </p>
+    <p>
+      where g is Gumbel noise and &tau; is a temperature hyperparameter controlling how close the
+      samples are to one-hot. The encoder produces pairwise edge embeddings h<sub>ij</sub> via a
+      graph neural network operating over channel histories, then samples discrete edges from this
+      relaxed distribution.
+    </p>
+    <p>
+      The decoder takes the sampled causal graph and propagates information through it to model
+      temporal dynamics. For each channel j, a message-passing step aggregates hidden states from
+      causally upstream channels weighted by the graph edges:
+    </p>
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #E04D14;">
+      MSG<sub>j</sub><sup>t</sup> = &sum;<sub>i</sub> z<sub>ij</sub> &middot; h&#771;<sub>ij</sub><sup>t</sup> &nbsp;&nbsp;&nbsp; h&#771;<sub>j</sub><sup>(t+1)</sup> = f<sub>seq</sub>(MSG<sub>j</sub><sup>t</sup>, h&#771;<sub>j</sub><sup>(1:t)</sup>)
+    </p>
+    <p>
+      The <strong>saturation module</strong> applies a learned S-curve transformation to the temporal
+      output, modeling the diminishing returns structure of advertising spend. The shape parameters
+      &alpha; and &gamma; are themselves functions of the contextual variables C<sub>n</sub>, so
+      saturation behavior is heterogeneous across shops:
+    </p>
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #0062A3;">
+      Saturation(x) = x<sup>&alpha;</sup> / (x<sup>&alpha;</sup> + &gamma;) &nbsp;&nbsp;&nbsp; where &alpha; = f<sub>&alpha;</sub>(C<sub>n</sub>), &gamma; = f<sub>&gamma;</sub>(C<sub>n</sub>)
+    </p>
+    <p>
+      The full model is trained by optimizing a variational lower bound that jointly maximizes
+      predictive accuracy and regularizes the learned causal structure:
+    </p>
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #E04D14;">
+      L = E[log p<sub>&theta;</sub>((X, y) | z)] - &lambda; &middot; KL[ q<sub>&phi;</sub>(z | (X, y)) || p(z) ]
+    </p>
+    <p>
+      The KL term penalizes deviation from a sparse prior over the causal graph, biasing the model
+      toward recovering compact structures. The penalty factor &lambda; controls this trade-off:
+      too small and the model learns dense uninformative graphs; too large and it collapses to no
+      edges. Training complexity scales as O(WT) where W is the number of parameters and T is the
+      sequence length - linear in data size, which matters for the platform-scale deployment this
+      work targets.
+    </p>
+
+    <h2>Key Findings</h2>
+    <ul>
+      <li>
+        <strong>Automatic causal structure discovery outperforms expert-specified graphs.</strong>
+        On the AirMMM real-world dataset, learned structures produced better GMV predictions than
+        baselines that use pre-defined causal assumptions, across all forecasting horizons tested.
+      </li>
+      <li>
+        <strong>5.7%-7.1% AUROC improvement over best causal discovery baseline.</strong>
+        CausalMMM achieves 0.935 AUROC on Simulation 1 versus 0.863 for InGRA, the strongest prior
+        method, on the causal structure recovery task over synthetic ground-truth data.
+      </li>
+      <li>
+        <strong>Marketing-specific constraints matter for causal discovery.</strong>
+        Ablations show that removing the saturation module (CM-rw) degrades GMV prediction from
+        MSE 1.80 to 3.09 at M=7 steps - a 71.7% increase in error - even when the causal structure
+        is otherwise correct.
+      </li>
+      <li>
+        <strong>Heterogeneity modeling is robust across different numbers of latent structures.</strong>
+        At R=10 latent shop-type clusters, CausalMMM achieves AUROC 0.925 versus 0.865 for InGRA,
+        maintaining the performance gap as structural complexity increases.
+      </li>
+      <li>
+        <strong>Performance is stable as channel count and sequence length scale.</strong>
+        At d=20 advertising channels and T=720 time steps, the model maintains 0.941 accuracy -
+        a configuration that approximates real deployment conditions.
+      </li>
+      <li>
+        <strong>Gumbel-Softmax temperature requires calibration.</strong>
+        At very low temperatures, samples approach one-hot and gradient flow collapses. The model is
+        sensitive to &tau; but not fragile: a moderate temperature range yields consistent results.
+      </li>
+    </ul>
+
+    <h2>Results</h2>
+    <p>
+      The evaluation covers two tracks: causal structure recovery on synthetic datasets with known
+      ground-truth DAGs, and GMV prediction on the real-world AirMMM dataset from an e-commerce
+      platform (50 shops, 12 advertising channels, 5 contextual variables, 676 days of observations
+      from January 30, 2021 to December 6, 2022).
+    </p>
+    <p><strong>Causal Structure Learning (Simulation 1 / Simulation 2):</strong></p>
+    <ul>
+      <li>CausalMMM AUROC: <strong>0.935 &plusmn; 0.012</strong> / <strong>0.903 &plusmn; 0.015</strong></li>
+      <li>InGRA (best prior method) AUROC: 0.863 &plusmn; 0.082 / 0.854 &plusmn; 0.083</li>
+      <li>GVAR AUROC: 0.821 / 0.800 (approximate from reported figures)</li>
+      <li>NGC AUROC: below 0.80 in both simulations</li>
+      <li>Improvement over InGRA: <strong>5.7% on Sim 1, 7.1% on Sim 2</strong>, with substantially
+      lower variance - the error bars on InGRA (±0.082) are nearly 7x wider than CausalMMM (±0.012)</li>
+    </ul>
+    <p><strong>GMV Prediction on AirMMM (MSE, lower is better):</strong></p>
+    <ul>
+      <li>M=1 step: CausalMMM <strong>0.29</strong> vs BTVC 0.47, GVAR 0.37, LSTM 0.52</li>
+      <li>M=7 steps: CausalMMM <strong>1.80</strong> vs BTVC 2.07, GVAR 1.91</li>
+      <li>M=30 steps: CausalMMM <strong>9.55</strong> vs BTVC 9.43, GVAR 12.41</li>
+    </ul>
+    <p>
+      At M=30 steps, BTVC slightly outperforms CausalMMM (9.43 vs 9.55 MSE). The authors note this
+      is expected: at very long horizons, Bayesian temporal models with strong structural priors
+      can outperform learned approaches where distributional shift accumulates. The gap is narrow
+      and does not affect the overall ranking.
+    </p>
+    <p><strong>Ablation Study (M=7 GMV MSE):</strong></p>
+    <ul>
+      <li>CM-full (causal encoder removed, no graph): MSE 2.65</li>
+      <li>CM-markov (temporal carryover module removed): MSE 2.85</li>
+      <li>CM-rw (saturation module removed): MSE 3.09</li>
+      <li>Full CausalMMM: <strong>MSE 1.80</strong></li>
+    </ul>
+    <p>
+      The ablation ordering is notable: saturation contributes more to prediction quality than
+      carryover, and carryover contributes more than the causal graph itself in the short-term
+      prediction window. The causal structure's primary value is in medium-to-long horizon
+      prediction and in producing interpretable attribution for budget allocation.
+    </p>
+
+    <h2>Why This Matters for AI and Automation</h2>
+    <p>
+      This paper sits at the intersection of two fields that rarely collaborate directly: causal
+      discovery and applied marketing science. The implications extend well beyond MMM.
+    </p>
+    <ul>
+      <li>
+        <strong>Automated causal graph learning for business data.</strong> The CausalMMM framework
+        generalizes to any setting where multiple correlated time series jointly cause a target
+        outcome and the causal structure is unknown or heterogeneous. Supply chain demand modeling,
+        multi-touch attribution in digital analytics, and operational efficiency optimization
+        are all structurally similar problems.
+      </li>
+      <li>
+        <strong>Heterogeneous structure learning at scale.</strong> The variational inference
+        approach allows the model to share statistical strength across shops while recovering
+        shop-specific graphs. This is a pattern applicable to any large-scale platform where
+        entities share domain structure but differ in specifics - financial risk modeling, healthcare
+        patient subtyping, recommendation systems with segment-level treatment effects.
+      </li>
+      <li>
+        <strong>Interpretability with quantifiable constraints.</strong> The learned causal graph
+        is a direct output of the model, not a post-hoc explanation. Budget allocation decisions
+        derived from these graphs are auditable: you can inspect which channel relationships the
+        model recovered and whether they align with domain knowledge.
+      </li>
+      <li>
+        <strong>Variational inference + discrete structure learning as a design pattern.</strong>
+        The Gumbel-Softmax trick for learning discrete latent structures end-to-end - without
+        relying on REINFORCE or other high-variance gradient estimators - is directly applicable
+        to neural architecture search, program synthesis, and any task requiring differentiable
+        selection over discrete combinatorial spaces.
+      </li>
+      <li>
+        <strong>Domain constraints improve data-driven models.</strong> The saturation and carryover
+        modules are not generic regularizers - they encode prior knowledge about how advertising
+        works. The ablation results show they contribute more to prediction quality than the causal
+        structure alone. This is a reminder that for applied ML in structured domains, baking in
+        domain constraints beats larger models.
+      </li>
+    </ul>
+
+    <h2>My Take</h2>
+    <p>
+      The strongest contribution here is not the AUROC improvement over InGRA - it is the
+      demonstration that causal structure learning and domain-constrained response modeling can
+      be trained jointly within a single variational framework without either component degrading
+      the other. Prior work in causal discovery treated structure learning and downstream prediction
+      as separate stages. CausalMMM makes them co-dependent and shows that joint training strictly
+      dominates.
+    </p>
+    <p>
+      The variance reduction is underappreciated in the headline numbers. InGRA achieves AUROC
+      0.863 with standard deviation 0.082. CausalMMM achieves 0.935 with standard deviation 0.012.
+      For a system you are deploying to make budget allocation decisions at platform scale, the
+      reliability of the causal structure matters as much as its average quality. A method that is
+      occasionally right but frequently wrong about channel relationships is not deployable.
+    </p>
+    <p>
+      The M=30 horizon result (where BTVC slightly outperforms) is worth watching. The authors
+      frame it as a known trade-off, but it points at a real limitation: learned causal structures
+      are fit on historical patterns and do not extrapolate well when marketing dynamics shift
+      seasonally or through campaign strategy changes. The Bayesian prior in BTVC provides
+      robustness that a learned latent graph does not. A hybrid approach - strong structural
+      priors informed by the learned graph, rather than either/or - seems like the logical
+      next step.
+    </p>
+    <p>
+      One gap not addressed: the evaluation is on a single platform (the AirMMM dataset from
+      one unnamed e-commerce operator). MMM applications span retail, CPG, financial services,
+      and gaming verticals with very different channel mixes and saturation dynamics. Whether
+      the contextual variable mechanism for heterogeneous saturation parameters generalizes
+      across these verticals is an open question the paper does not answer.
+    </p>
+
+    <p>
+      <strong>Discussion question:</strong> CausalMMM learns shop-specific causal graphs but
+      still relies on historical spend-to-outcome data to do so - meaning it cannot recover
+      causal structure for new shops or new channels without observation history. Compared to
+      approaches like DoWhy or Double Machine Learning that can handle experimental (A/B test)
+      data directly, how should practitioners think about when to use learned causal discovery
+      methods versus intervention-based causal estimation for marketing attribution?
+    </p>
+
+  </div>
+
+  <!-- SHARE SECTION -->
+  <div class="share-section">
+    <h3>Share this discussion</h3>
+    <div class="share-buttons">
+      <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fsatishkc7.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-06.html&title=CausalMMM%3A%20Learning%20Causal%20Structure%20for%20Marketing%20Mix%20Modeling"
+         target="_blank" rel="noopener" class="share-btn linkedin">
+        LinkedIn
+      </a>
+      <a href="https://twitter.com/intent/tweet?text=Week%2003%3A%20CausalMMM%20%E2%80%94%20Learning%20Causal%20Structure%20for%20Marketing%20Mix%20Modeling&url=https%3A%2F%2Fsatishkc7.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-06.html"
+         target="_blank" rel="noopener" class="share-btn twitter">
+        X / Twitter
+      </a>
+      <button class="share-btn copy" id="copy-btn" onclick="
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          this.textContent = 'Copied!';
+          setTimeout(() => { this.textContent = 'Copy Link'; }, 2000);
+        });
+      ">
+        Copy Link
+      </button>
+    </div>
+  </div>
+
+  <!-- POST NAVIGATION -->
+  <div class="post-nav">
+    <a href="../index.html">&#8592; Back to all papers</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <a href="../about.html">About</a>
+      <a href="https://github.com/satishkc7" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://linkedin.com/in/satishkc7" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <p>&copy; 2026 AI &amp; Automation Chronicle &middot; Built by <a href="https://github.com/satishkc7" target="_blank" rel="noopener">Satish K C</a></p>
+  </footer>
+
+  <!-- READING PROGRESS SCRIPT -->
+  <script>
+    const bar = document.getElementById('progress-bar');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = docHeight > 0 ? (scrollTop / docHeight * 100) + '%' : '0%';
+    });
+  </script>
+
+</body>
+</html>
