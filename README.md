@@ -10,7 +10,7 @@ A weekly blog series covering AI and automation research - deep-dives into paper
 
 ## Live Site
 
-Visit the blog at: [ai-automation-chronicle.github.io](https://ai-automation-chronicle.github.io)
+Visit the blog at: [ai-automation-chronicle.github.io](https://ai-automation-chronicle.github.io/ai-automation-chronicle/)
 
 ## Structure
 
