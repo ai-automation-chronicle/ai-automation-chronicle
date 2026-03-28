@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="A deep dive into Mamba: Linear-Time Sequence Modeling with Selective State Spaces - the 2023 paper that challenged Transformer dominance with input-dependent SSMs."/>
+  <meta property="og:title" content="Mamba: Linear-Time Sequence Modeling with Selective State Spaces · AI & Automation Chronicle"/>
+  <meta property="og:description" content="How Albert Gu and Tri Dao made State Space Models input-aware, achieving linear-time sequence modeling that matches Transformer quality at a fraction of the compute cost."/>
+  <meta property="og:type" content="article"/>
+  <title>Week 04 · Mamba: Linear-Time Sequence Modeling · AI & Automation Chronicle</title>
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SWMR2ZGHJE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-SWMR2ZGHJE');
+  </script>
+</head>
+<body>
+
+  <!-- READING PROGRESS BAR -->
+  <div id="progress-bar"></div>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="../index.html" class="nav-brand">AI & <span>Automation</span> Chronicle</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <div class="breadcrumb-inner">
+      <a href="../index.html">Home</a>
+      <span class="breadcrumb-sep">&#8250;</span>
+      <span class="breadcrumb-current">Week 04 &middot; Mamba: Linear-Time Sequence Modeling</span>
+    </div>
+  </div>
+
+  <!-- POST HEADER -->
+  <div class="post-header">
+    <div class="post-header-inner">
+      <span class="post-week">Week 04 &middot; March 2026</span>
+      <h1>Mamba: Linear-Time Sequence Modeling with Selective State Spaces</h1>
+      <div class="post-header-meta">
+        <span>March 28, 2026 &middot; by Satish K C</span>
+        <span>15 min read</span>
+      </div>
+      <div class="post-header-tags">
+        <span class="tag">Deep Learning</span>
+        <span class="tag green">Efficiency</span>
+        <span class="tag purple">LLMs</span>
+        <span class="tag orange">Optimization</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- POST BODY -->
+  <div class="post-body">
+
+    <h2>The Paper</h2>
+    <p>
+      <strong>"Mamba: Linear-Time Sequence Modeling with Selective State Spaces"</strong> was submitted to
+      arXiv on December 1, 2023 (arXiv:2312.00752) by <strong>Albert Gu</strong> (Carnegie Mellon University)
+      and <strong>Tri Dao</strong> (Princeton University / Together AI), and was accepted at
+      <strong>ICLR 2024</strong>. Within two years of publication, the paper accumulated over 5,000
+      citations - an extraordinary reception for a paper that directly challenged the architectural
+      consensus built around Transformers.
+    </p>
+    <p>
+      The central claim is precise: the computational bottleneck of Transformers on long sequences is not
+      a tuning problem or an engineering problem. It is a structural one. Transformer attention scales as
+      O(L<sup>2</sup>) in both time and memory with sequence length L. Mamba proposes an alternative
+      architecture based on <strong>Selective State Space Models (SSMs)</strong> that achieves O(L)
+      complexity while matching or exceeding Transformer quality across language, DNA, and audio benchmarks.
+    </p>
+    <a href="https://arxiv.org/abs/2312.00752" target="_blank" rel="noopener" class="paper-link">
+      Read the Paper on arXiv &#8594;
+    </a>
+
+    <h2>The Problem Before This Paper</h2>
+    <p>
+      State Space Models are not new. The mathematical framework - systems that map sequences through a
+      latent continuous-time state - has been studied in signal processing for decades. What changed in
+      2021-2022 was the discovery that SSMs could be made competitive with Transformers on sequence
+      modeling tasks through careful structural design. Work including <strong>S4</strong> (Gu et al., 2021),
+      <strong>H3</strong> (Fu et al., 2023), and <strong>Hyena</strong> (Poli et al., 2023) established that
+      structured SSMs could achieve strong results on long-range dependency benchmarks while maintaining
+      linear complexity.
+    </p>
+    <p>
+      But all of these models shared a fundamental constraint: they were <strong>Linear Time-Invariant (LTI)</strong>
+      systems. The state transition matrices A, B, and C were fixed across the entire input sequence -
+      the same transformation applied to every token regardless of content. This design choice is what
+      enables efficient computation via convolutions, but it comes with a hard architectural ceiling.
+    </p>
+    <p>
+      Specifically, LTI SSMs cannot perform <strong>content-based reasoning</strong>. They cannot selectively
+      ignore irrelevant context, hold certain information in state indefinitely while forgetting other
+      inputs, or dynamically adjust how information flows based on what the tokens actually contain. On
+      tasks that require this - selective copying, induction heads, long-context recall - LTI SSMs failed
+      almost completely, falling close to random-chance performance. Transformers, by contrast, handle
+      these tasks via attention, which explicitly scores token-to-token compatibility at every step.
+    </p>
+    <p>
+      Gu and Dao's diagnosis: the core limitation of prior SSMs was not the linear recurrence framework.
+      It was the time-invariance constraint. The solution was to make the parameters input-dependent.
+    </p>
+
+    <h2>What They Built</h2>
+    <p>
+      The foundation is the continuous-time SSM. Given an input sequence x(t), the model maintains a
+      hidden state h(t) and produces output y(t) through the following system:
+    </p>
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #E04D14;">
+      h'(t) = A h(t) + B x(t)<br>
+      y(t) = C h(t)
+    </p>
+    <p>
+      In prior SSMs, A, B, and C are fixed matrices learned during training. For discrete-time computation
+      on tokens, this continuous system is discretized using zero-order hold (ZOH) with a learnable
+      timescale parameter Delta:
+    </p>
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #0062A3;">
+      A_bar = exp(Delta * A)<br>
+      B_bar = (Delta * A)<sup>-1</sup> (exp(Delta * A) - I) * Delta * B<br><br>
+      h_t = A_bar * h_{t-1} + B_bar * x_t<br>
+      y_t = C * h_t
+    </p>
+    <p>
+      The selective mechanism in Mamba is a direct extension: <strong>Delta, B, and C are made functions
+      of the input x_t</strong>. These parameters are no longer learned constants - they are outputs of
+      linear projections applied to the current token. This single change transforms the architecture from
+      a fixed filter into a content-aware sequential model:
+    </p>
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #E04D14;">
+      B_t = Linear_B(x_t)<br>
+      C_t = Linear_C(x_t)<br>
+      Delta_t = softplus( Linear_Delta(x_t) + parameter )<br><br>
+      h_t = A_bar_t * h_{t-1} + B_bar_t * x_t<br>
+      y_t = C_t * h_t
+    </p>
+    <p>
+      Delta functions as a <strong>gating mechanism</strong>. When Delta_t is large, the discretized A_bar
+      approaches the identity - the model forgets the previous state and focuses on the current input.
+      When Delta_t is small, the state carries forward with minimal update. B and C control which
+      information gets written into and read from the state at each step, conditioned on the current
+      token's content.
+    </p>
+    <p>
+      The challenge this creates is computational. Standard SSMs exploit their LTI structure to compute
+      the entire output via a <strong>global convolution</strong> in O(L log L) time using the Fast Fourier
+      Transform. Making parameters input-dependent breaks this - a content-aware recurrence cannot be
+      expressed as a fixed convolution. Without a workaround, selective SSMs would be forced back into
+      sequential computation: O(L) in complexity but with a constant factor too large to be practical
+      on modern hardware.
+    </p>
+    <p>
+      The solution is a <strong>hardware-aware parallel scan algorithm</strong>. Gu and Dao observe that
+      the recurrence h_t = A_bar_t * h_{t-1} + B_bar_t * x_t is a first-order linear recurrence, and
+      these can be computed in parallel via prefix-sum scan operations. Critically, the bottleneck on
+      GPUs is not computation but memory bandwidth - moving data between HBM (high bandwidth memory) and
+      SRAM (on-chip cache) is the slow step. Their implementation uses kernel fusion to keep all
+      intermediate states and parameters in SRAM during computation, performing discretization and the
+      recurrence entirely without reading from or writing to HBM. The result is a CUDA kernel that
+      achieves the theoretical linear complexity with practical throughput that competes with FlashAttention.
+    </p>
+    <p>
+      The complete <strong>Mamba block</strong> is minimal: a selective SSM layer with input and output
+      projections, paired with a gated MLP-style branch, and wrapped with layer normalization and a
+      residual connection. There is no attention mechanism, no key-value cache, and no MLP sublayer
+      separate from the block itself. Stacking these blocks end-to-end produces the full model.
+    </p>
+
+    <h2>Key Findings</h2>
+    <ul>
+      <li>
+        <strong>Selection mechanism solves content-based reasoning.</strong> Making Delta, B, C
+        input-dependent enables the model to dynamically filter, retain, or discard information based
+        on token content - a capability that LTI SSMs structurally cannot possess.
+      </li>
+      <li>
+        <strong>Linear scaling with sequence length.</strong> Both training and inference scale O(L)
+        in memory and time. Inference is additionally O(1) per step in a recurrent pass, as only the
+        fixed-size state h needs to be maintained - no growing KV cache.
+      </li>
+      <li>
+        <strong>Hardware-efficient implementation removes the practical gap.</strong> The parallel
+        scan algorithm achieves real-world throughput competitive with attention at short sequences
+        and increasingly dominant at longer sequences, where attention's O(L<sup>2</sup>) memory
+        cost becomes prohibitive.
+      </li>
+      <li>
+        <strong>Architecture generalizes across modalities.</strong> The same Mamba block structure,
+        without modification, achieves strong results on language, DNA sequence modeling, and audio
+        generation - suggesting the selective SSM captures genuinely general structure in sequential data.
+      </li>
+      <li>
+        <strong>Induction heads emerge naturally.</strong> Induction heads - the mechanism by which
+        Transformers perform in-context learning - arise in Mamba models trained on language data,
+        despite the fundamentally different computation mechanism.
+      </li>
+    </ul>
+
+    <h2>Results</h2>
+    <p>
+      The paper benchmarks Mamba against Transformer baselines at matched parameter counts. All language
+      modeling experiments use <strong>The Pile</strong> dataset. The baseline series is <strong>Pythia</strong>
+      (EleutherAI), which uses the same data, tokenizer, and training setup, making comparisons direct.
+    </p>
+    <ul>
+      <li>
+        <strong>Language modeling perplexity (The Pile):</strong> Mamba-1.4B achieves perplexity matching
+        <strong>Pythia-6.9B</strong> - a model nearly 5x larger. Mamba-3B matches Transformer quality at
+        approximately 2x its own parameter count.
+      </li>
+      <li>
+        <strong>Inference throughput:</strong> At sequence length 2048, Mamba achieves
+        <strong>5x higher throughput</strong> than Transformer baselines. Throughput advantage scales
+        with sequence length - at 16K tokens, the gap widens substantially as attention's quadratic
+        memory pressure forces smaller batch sizes.
+      </li>
+      <li>
+        <strong>Synthetic tasks (selective copying):</strong> <strong>99.8% accuracy</strong> on the
+        selective copying task, which requires retaining only relevant tokens from a noisy input sequence.
+        All LTI SSM baselines score near random chance (under 20%). Transformer-based models solve this
+        task but at O(L<sup>2</sup>) cost.
+      </li>
+      <li>
+        <strong>Induction heads:</strong> Perfect performance, matching Transformers and far exceeding
+        all LTI SSMs tested.
+      </li>
+      <li>
+        <strong>DNA modeling (GenomicsBenchmarks):</strong> At 40M parameters, Mamba achieves
+        <strong>3-4x parameter efficiency</strong> over Transformer baselines across classification
+        tasks on human genomic sequences. Hyena (a prior sub-quadratic model) is also outperformed
+        at matched parameter counts.
+      </li>
+      <li>
+        <strong>Audio generation (SC09 benchmark):</strong> Mamba surpasses SaShiMi on FID scores
+        for speech generation, while training at substantially higher throughput on long audio sequences
+        where attention memory costs become impractical.
+      </li>
+    </ul>
+    <p>
+      Hardware specs for language model experiments: 8x A100-80GB GPUs. Mamba models were trained using
+      bf16 precision with no gradient checkpointing required at the sequence lengths tested.
+    </p>
+
+    <h2>Why This Matters for AI and Automation</h2>
+    <p>
+      The practical impact of Mamba is not just benchmark numbers. It is the argument that
+      Transformer attention is not the only viable path to general-purpose sequence modeling at scale.
+      For practitioners, this opens up concrete options:
+    </p>
+    <ul>
+      <li>
+        <strong>Long-context inference without quadratic cost.</strong> Applications requiring very
+        long context windows - legal document analysis, genomics, long-form code generation, hour-long
+        audio transcription - can use Mamba-style architectures without the memory cost that makes
+        attention-based long-context impractical or expensive.
+      </li>
+      <li>
+        <strong>Constant-memory streaming inference.</strong> Because Mamba's recurrent pass maintains
+        only a fixed-size state, it is inherently suited to streaming workloads where the sequence
+        grows unboundedly over time. There is no KV cache growing proportionally to conversation length.
+      </li>
+      <li>
+        <strong>Edge and embedded deployment.</strong> The memory footprint at inference is predictable
+        and bounded, regardless of sequence length - a property that attention-based models cannot
+        offer without approximate KV cache compression.
+      </li>
+      <li>
+        <strong>Foundation for hybrid architectures.</strong> Jamba (AI21 Labs, 2024) and Griffin
+        (Google DeepMind, 2024) directly adopted Mamba layers, interleaving them with attention
+        layers in hybrid designs that outperform pure-Transformer and pure-Mamba models on some tasks.
+      </li>
+      <li>
+        <strong>Genomics and scientific sequence modeling.</strong> The parameter efficiency demonstrated
+        on DNA sequences is significant for domains where labeled data is expensive and model training
+        budgets are constrained relative to industry LLM workloads.
+      </li>
+      <li>
+        <strong>Prompted rethinking of attention's role.</strong> Mamba-2 (2024) later showed a formal
+        equivalence between the selective SSM and a restricted form of linear attention, tightening
+        the theoretical connection between the two frameworks and suggesting hybrid designs have strong
+        theoretical grounding.
+      </li>
+    </ul>
+
+    <h2>My Take</h2>
+    <p>
+      The selection mechanism is the paper's genuinely novel contribution. The insight that Delta acts
+      as a continuous gate - controlling whether the model focuses on new input or carries forward
+      existing state - is clean and well-motivated. Prior SSMs were powerful but fundamentally passive:
+      they filtered sequences through fixed learned dynamics. Mamba's dynamics respond to content,
+      which is what makes it competitive on the tasks that previously separated SSMs from Transformers.
+    </p>
+    <p>
+      The hardware-aware implementation is underrated in discussions of this paper. The theoretical
+      O(L) complexity of selective SSMs had been understood before Mamba - the open question was
+      whether a practical GPU implementation could match Transformer throughput, which had years of
+      optimization work behind it. Gu and Dao's parallel scan kernel in SRAM is what closed that gap.
+      Without it, the paper's benchmark numbers would look very different. This is a recurring pattern
+      in deep learning: algorithmic and systems contributions are inseparable, but the systems work
+      rarely gets proportional credit.
+    </p>
+    <p>
+      The limitations are real but manageable. On short sequences (under 2K tokens), Transformer
+      attention is still faster and the quality gap is narrow. Mamba's clear advantage emerges at
+      longer context lengths. The paper's language benchmarks also use greedy evaluation and
+      character-level tasks where Mamba's linear scan is particularly well-suited - it is an open
+      question how selective SSMs perform at truly large scale (70B+ parameters) and on multi-step
+      reasoning benchmarks where attention's direct token-to-token routing may still hold structural
+      advantages.
+    </p>
+    <p>
+      That said, the follow-on literature has moved faster on this than almost any architecture paper
+      in recent memory. RWKV-v6, Griffin, Jamba, and Mamba-2 all appeared within 12 months. That pace
+      is a reliable signal that the core idea here is genuine and extensible. Whether SSMs ultimately
+      displace Transformers or converge with them in hybrid forms, Mamba defined the architecture
+      conversation for 2024.
+    </p>
+
+    <p>
+      <strong>Discussion question:</strong> Mamba-2 (Dao and Gu, 2024) established a formal connection
+      between selective SSMs and a restricted variant of linear attention, suggesting the two frameworks
+      are more similar than the original paper implied. Hybrid architectures like Griffin and Jamba
+      interleave Mamba and attention layers rather than replacing one with the other. Does that
+      convergence suggest that full-attention replacement is the wrong goal - and that the real
+      contribution of Mamba is establishing SSMs as a first-class component in hybrid sequence models
+      rather than a stand-alone Transformer alternative?
+    </p>
+
+  </div>
+
+  <!-- SHARE SECTION -->
+  <div class="share-section">
+    <h3>Share this discussion</h3>
+    <div class="share-buttons">
+      <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fsatishkc7.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-08.html&title=Mamba%3A%20Linear-Time%20Sequence%20Modeling%20with%20Selective%20State%20Spaces"
+         target="_blank" rel="noopener" class="share-btn linkedin">
+        LinkedIn
+      </a>
+      <a href="https://twitter.com/intent/tweet?text=Week%2004%3A%20Mamba%20-%20Linear-Time%20Sequence%20Modeling%20with%20Selective%20State%20Spaces&url=https%3A%2F%2Fsatishkc7.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-08.html"
+         target="_blank" rel="noopener" class="share-btn twitter">
+        X / Twitter
+      </a>
+      <button class="share-btn copy" id="copy-btn" onclick="
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          this.textContent = 'Copied!';
+          setTimeout(() => { this.textContent = 'Copy Link'; }, 2000);
+        });
+      ">
+        Copy Link
+      </button>
+    </div>
+  </div>
+
+  <!-- POST NAVIGATION -->
+  <div class="post-nav">
+    <a href="../index.html">&#8592; Back to all papers</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <a href="../about.html">About</a>
+      <a href="https://github.com/satishkc7" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://linkedin.com/in/satishkc7" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <p>&copy; 2026 AI &amp; Automation Chronicle &middot; Built by <a href="https://github.com/satishkc7" target="_blank" rel="noopener">Satish K C</a></p>
+  </footer>
+
+  <!-- READING PROGRESS SCRIPT -->
+  <script>
+    const bar = document.getElementById('progress-bar');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = docHeight > 0 ? (scrollTop / docHeight * 100) + '%' : '0%';
+    });
+  </script>
+
+</body>
+</html>
