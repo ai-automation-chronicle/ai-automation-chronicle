@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="A deep dive into DeepSeek-OCR 2: Visual Causal Flow - the January 2026 paper that replaces CLIP ViT with a causal LLM encoder to achieve semantic-aware visual token ordering for document understanding."/>
+  <meta property="og:title" content="DeepSeek-OCR 2: Visual Causal Flow · AI & Automation Chronicle"/>
+  <meta property="og:description" content="How Haoran Wei, Yaofeng Sun, and Yukun Li replaced raster-scan visual encoding with semantically-driven causal flow queries, achieving 91.09% on OmniDocBench v1.5 and outperforming Gemini-3 Pro at matched token budgets."/>
+  <meta property="og:type" content="article"/>
+  <title>Week 05 · DeepSeek-OCR 2: Visual Causal Flow · AI & Automation Chronicle</title>
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SWMR2ZGHJE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-SWMR2ZGHJE');
+  </script>
+</head>
+<body>
+
+  <!-- READING PROGRESS BAR -->
+  <div id="progress-bar"></div>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="../index.html" class="nav-brand">AI & <span>Automation</span> Chronicle</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <div class="breadcrumb-inner">
+      <a href="../index.html">Home</a>
+      <span class="breadcrumb-sep">&#8250;</span>
+      <span class="breadcrumb-current">Week 05 &middot; DeepSeek-OCR 2: Visual Causal Flow</span>
+    </div>
+  </div>
+
+  <!-- POST HEADER -->
+  <div class="post-header">
+    <div class="post-header-inner">
+      <span class="post-week">Week 05 &middot; March 2026</span>
+      <h1>DeepSeek-OCR 2: Visual Causal Flow</h1>
+      <div class="post-header-meta">
+        <span>March 30, 2026 &middot; by Satish K C</span>
+        <span>14 min read</span>
+      </div>
+      <div class="post-header-tags">
+        <span class="tag">Deep Learning</span>
+        <span class="tag green">Transformers</span>
+        <span class="tag purple">NLP</span>
+        <span class="tag orange">Optimization</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- POST BODY -->
+  <div class="post-body">
+
+    <h2>The Paper</h2>
+    <p>
+      <strong>"DeepSeek-OCR 2: Visual Causal Flow"</strong> was submitted to arXiv on January 28, 2026
+      (arXiv:2601.20552v1) by <strong>Haoran Wei</strong>, <strong>Yaofeng Sun</strong>, and
+      <strong>Yukun Li</strong> from DeepSeek AI. The paper is licensed under CC BY 4.0 and the model
+      weights are publicly available at github.com/deepseek-ai/DeepSeek-OCR-2. As of publication it is
+      not yet accepted to a conference venue, but sits in the Computer Vision and Pattern Recognition
+      (cs.CV) category.
+    </p>
+    <p>
+      The core claim: raster-scan token ordering - the default processing order in virtually all vision
+      encoders - is architecturally mismatched with how semantic information is distributed in documents.
+      The paper introduces <strong>DeepEncoder V2</strong>, which replaces CLIP ViT with a language model
+      used as a vision encoder, equipped with learned causal flow queries that dynamically reorder attention
+      over visual tokens based on image semantics. On OmniDocBench v1.5, the system reaches
+      <strong>91.09% overall performance</strong>, a 3.73% improvement over DeepSeek-OCR v1, and
+      outperforms Gemini-3 Pro at an equal visual token budget of 1,120.
+    </p>
+    <a href="https://arxiv.org/abs/2601.20552" target="_blank" rel="noopener" class="paper-link">
+      Read the Paper on arXiv &#8594;
+    </a>
+
+    <h2>The Problem Before This Paper</h2>
+    <p>
+      Document OCR is not just a character recognition problem. A production-grade document understanding
+      system needs to handle multi-column layouts, tables with merged cells, embedded formulas, reading
+      order across figure captions and footnotes, and handwritten annotations alongside typeset text.
+      These requirements make the vision encoder - not the language decoder - the critical component.
+    </p>
+    <p>
+      The dominant architecture for multimodal document understanding encodes images with
+      <strong>CLIP ViT</strong> (approximately 300M parameters), projects the visual tokens via a learned
+      adapter, and feeds them as a prefix into an LLM decoder. This approach has two structural problems
+      for document OCR specifically.
+    </p>
+    <p>
+      First, all visual tokens are generated in fixed raster-scan order: left-to-right, top-to-bottom,
+      row by row. This ordering carries no semantic information. A dense table header, a page number in
+      the margin, and a mathematical formula in the body are interleaved in exactly the same way
+      regardless of their semantic relationships or their relevance to the decoding task. CLIP ViT
+      processes these tokens with bidirectional attention, so it can in principle relate any two patches,
+      but the sequence passed to the decoder carries no learned notion of which regions should be
+      attended to first.
+    </p>
+    <p>
+      Second, prior work - notably <strong>BLIP-2</strong> (Li et al., 2023) and its Q-Former - addressed
+      visual token compression by introducing 32 learnable query tokens that cross-attend to the full
+      set of ViT output tokens. This creates an information bottleneck: compressing hundreds of patch
+      tokens into 32 fixed queries inevitably loses fine-grained spatial structure, which is fatal for
+      formula recognition, table cell alignment, and reading order recovery. The Q-Former approach
+      reduces the number of tokens passed to the LLM but does so with no mechanism for preserving
+      layout-critical information.
+    </p>
+    <p>
+      The paper's diagnosis: the bottleneck is not the number of visual tokens. It is the absence of
+      a mechanism that learns which tokens to surface first, and in what order, relative to the semantic
+      content of the image.
+    </p>
+
+    <h2>What They Built</h2>
+    <p>
+      The architecture is an encoder-decoder model. The encoder - DeepEncoder V2 - processes the image
+      and produces a compact sequence of causal tokens. The decoder is a 3B-parameter Mixture-of-Experts
+      LLM with approximately 500M active parameters per forward pass, based on DeepSeek-MoE.
+    </p>
+    <p>
+      <strong>Vision Tokenizer.</strong> The first stage of the encoder is a convolutional tokenizer
+      built on SAM-base with two additional convolutional layers added on top. Total parameter count
+      is approximately 80M. The tokenizer performs 16x spatial compression and reduces the feature
+      dimensionality from 1024 to 896. The role of this component is analogous to patch projection in
+      ViT: it converts the raw image pixels into a dense grid of patch representations, referred to as
+      visual tokens.
+    </p>
+    <p>
+      <strong>Language Model as Vision Encoder.</strong> The visual tokens produced by the tokenizer are
+      then processed by <strong>Qwen2-0.5B</strong> (500M parameters), a language model used as the
+      encoder rather than CLIP ViT. This is the key architectural shift. Unlike CLIP ViT - which was
+      trained on image-text contrastive objectives and generates a fixed-size output - Qwen2-0.5B
+      operates over the full variable-length sequence of visual tokens and learns to produce compact
+      causal flow query outputs from them.
+    </p>
+    <p>
+      The attention mask within this LLM encoder uses a dual-stream design:
+    </p>
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #E04D14;">
+      Attention mask structure (m visual tokens, n causal query tokens):<br><br>
+      [ ones(m x m)     |  zeros(m x n) ]<br>
+      [ ones(n x m)     |  tril(n x n)  ]
+    </p>
+    <p>
+      Visual tokens (the first m positions) use fully bidirectional attention among themselves - every
+      visual token can attend to every other visual token. Causal flow queries (the last n positions)
+      use causal (lower triangular) attention among themselves, and can attend to all visual tokens but
+      not to each other in future positions. Crucially, visual tokens cannot attend to causal query
+      positions: this prevents information from flowing backward from the queries into the visual token
+      representations, enforcing a clean separation between the two streams.
+    </p>
+    <p>
+      Only the last n token outputs - the causal flow queries - are passed to the MoE decoder. The
+      visual tokens are discarded after the encoder pass.
+    </p>
+    <p>
+      <strong>Causal Flow Query Count.</strong> The number of queries is determined by the image
+      resolution:
+    </p>
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #E04D14;">
+      num_queries = (W x H) / (16^2 x 16)
+    </p>
+    <p>
+      At the global view resolution of 1024x1024, this yields <strong>256 queries</strong>. For local
+      crops at 768x768, the formula yields <strong>144 queries per crop</strong>. The system processes
+      one global view and up to six local crops, giving a total token range of
+      <strong>[256, 1120] visual tokens</strong> passed to the decoder. The upper bound of 1,120 is
+      intentionally set to match Gemini-3 Pro's maximum visual token budget, enabling a direct
+      controlled comparison.
+    </p>
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #0062A3;">
+      Global view (1024x1024):  256 queries<br>
+      Local crop (768x768):     144 queries / crop<br>
+      Max crops k:              k in [0, 6]<br>
+      Total token range:        [256, 256 + 144*6] = [256, 1120]
+    </p>
+    <p>
+      <strong>Training Pipeline.</strong> The model is trained in three stages on approximately 100M
+      image-text pairs across 160 A100 GPUs (20 nodes x 8 GPUs each). The training data mixture is
+      80% OCR-specific content, sampled at a 3:1:1 ratio across text, formulas, and tables.
+    </p>
+    <p>
+      Stage 1 pretains the full encoder (vision tokenizer + Qwen2-0.5B) at resolutions 768x768 and
+      1024x1024, using AdamW with cosine decay from 1e-4 to 1e-6, for 40,000 iterations with 8K
+      sequence packing and a batch size of 640.
+    </p>
+    <p>
+      Stage 2 jointly optimizes the LLM encoder and the MoE decoder while keeping the vision tokenizer
+      frozen. A 4-stage pipeline parallel setup distributes the vision tokenizer, the LLM encoder, and
+      six decoder layers across 40 data-parallel replicas. Learning rate decays from 5e-5 to 1e-6 over
+      15,000 iterations with a global batch size of 1,280.
+    </p>
+    <p>
+      Stage 3 freezes DeepEncoder V2 entirely and continues training only the decoder for 20,000
+      iterations from 1e-6 to 5e-8. Freezing the encoder at this stage more than doubles training
+      throughput by eliminating the encoder's backward pass.
+    </p>
+
+    <h2>Key Findings</h2>
+    <ul>
+      <li>
+        <strong>Semantic token ordering improves formula and reading order recovery.</strong>
+        FormulaCDM improves by 6.17 percentage points (84.14% to 90.31%) and R-orderEdit drops from
+        0.085 to 0.057 - a 33% reduction in reading order error. These are the two metrics most
+        sensitive to the ordering of visual attention.
+      </li>
+      <li>
+        <strong>LLM encoders outperform CLIP at matched parameter budgets.</strong> Replacing CLIP ViT
+        (300M params) with Qwen2-0.5B (500M params) delivers consistent gains across all nine
+        document categories on OmniDocBench v1.5, with the most pronounced gains in formula-dense and
+        layout-complex categories.
+      </li>
+      <li>
+        <strong>Causal query compression avoids the Q-Former bottleneck.</strong> Rather than reducing
+        visual information to a fixed number of learned query slots (as in BLIP-2), causal flow queries
+        are resolution-adaptive. At higher resolutions, more queries are allocated, preserving spatial
+        granularity proportional to document complexity.
+      </li>
+      <li>
+        <strong>Cascaded 1D causal reasoners approximate 2D spatial understanding.</strong> The paper
+        frames DeepEncoder V2 as two cascaded causal reasoners - the LLM encoder and the LLM decoder -
+        operating on a linearized 2D image. This is presented as a tractable path toward 2D layout
+        reasoning without requiring native 2D positional encodings or autoregressive 2D decoders.
+      </li>
+      <li>
+        <strong>Production repetition rate reduces meaningfully.</strong> Online user logs show the
+        repetition rate drops from 6.25% to 4.17% - a failure mode that is difficult to isolate in
+        offline benchmarks but directly attributable to poor layout encoding in the predecessor.
+      </li>
+    </ul>
+
+    <h2>Results</h2>
+    <p>
+      All results are evaluated on <strong>OmniDocBench v1.5</strong>, which covers nine document
+      categories: PPT, Academic Paper, Book, Colorful Textbook, Exam Paper, Magazine, Newspaper, Note,
+      and Research Report. Metrics include TextEdit distance, FormulaEdit distance, FormulaCDM
+      (formula structure recognition), TableTEDs strict and loose, and R-orderEdit (reading order).
+    </p>
+    <ul>
+      <li>
+        <strong>Overall OmniDocBench v1.5:</strong> 91.09% (vs 87.36% for DeepSeek-OCR v1, +3.73%)
+      </li>
+      <li>
+        <strong>TextEdit:</strong> 0.048 (vs 0.073, -34% error)
+      </li>
+      <li>
+        <strong>FormulaEdit:</strong> 0.198 (vs 0.236, -16% error)
+      </li>
+      <li>
+        <strong>FormulaCDM:</strong> 90.31% (vs 84.14%, +6.17 pp)
+      </li>
+      <li>
+        <strong>TableTEDs strict:</strong> 87.75% (vs 85.25%, +2.50 pp)
+      </li>
+      <li>
+        <strong>TableTEDs loose:</strong> 92.06% (vs 89.01%, +3.05 pp)
+      </li>
+      <li>
+        <strong>R-orderEdit:</strong> 0.057 (vs 0.085, -33% error)
+      </li>
+    </ul>
+    <p>
+      At the equal visual token budget of 1,120 tokens, DeepSeek-OCR 2 achieves an overall edit
+      distance of <strong>0.100</strong> versus Gemini-3 Pro's <strong>0.115</strong> - a 13% relative
+      reduction in transcription error.
+    </p>
+    <p>
+      The weakest category across both models is <strong>Newspaper</strong>, with a text edit distance
+      of 0.139 for DeepSeek-OCR 2. The paper attributes this to the training data distribution: only
+      approximately 250k newspaper-format samples are present in the OCR 2.0 dataset, compared to
+      substantially higher counts for academic and exam paper categories.
+    </p>
+    <p>
+      On production traffic, the repetition rate - measured on online user logs and on a separate
+      PDF pretraining data evaluation set - drops from 6.25% to 4.17% (online) and from 3.69% to 2.88%
+      (PDF pretraining data). These figures are significant because repetition failures are a direct
+      user-facing quality issue that offline benchmarks underweight.
+    </p>
+    <p>
+      Training hardware: 160 A100-40GB GPUs across all three stages. No gradient checkpointing is
+      reported. The 3-stage pipeline reaches full convergence at 75,000 total iterations across stages.
+    </p>
+
+    <h2>Why This Matters for AI and Automation</h2>
+    <p>
+      Document understanding is a prerequisite for almost every enterprise automation pipeline that
+      touches unstructured data. Contracts, invoices, research papers, regulatory filings, and
+      technical manuals all require OCR as a first step before any downstream reasoning can occur.
+      The quality ceiling on that OCR step bounds the quality of everything downstream.
+    </p>
+    <ul>
+      <li>
+        <strong>Formula-heavy document automation.</strong> FormulaCDM improving from 84.14% to 90.31%
+        is directly relevant to any pipeline processing academic papers, patent filings, or technical
+        specifications. At sub-90% formula recognition, downstream reasoning over quantitative claims
+        is unreliable. DeepSeek-OCR 2 pushes past that threshold.
+      </li>
+      <li>
+        <strong>Reading order recovery for multi-column layouts.</strong> A 33% reduction in
+        R-orderEdit means fewer pipeline failures when processing magazine-style layouts, legal
+        documents with side annotations, or academic papers with footnotes and margin figures. This
+        is the step that most OCR systems handle worst, and the one that most directly breaks RAG
+        pipelines operating on PDFs.
+      </li>
+      <li>
+        <strong>Competitive performance at controlled token cost.</strong> The 1,120-token budget
+        comparison with Gemini-3 Pro establishes that a specialized, open-weights document model
+        outperforms a frontier multimodal model on this task class - at a token count that is
+        directly controllable in production serving configurations.
+      </li>
+      <li>
+        <strong>LLM-as-encoder pattern is generalizeable.</strong> The core design - using a pretrained
+        language model as the vision encoder rather than a contrastively trained ViT - is not OCR-specific.
+        The paper's discussion section explicitly identifies this as a direction toward a unified omni-modal
+        encoder, where modality-specific query embeddings differentiate input streams through shared
+        weight matrices. This is a meaningful architectural signal for teams building multimodal systems
+        beyond document understanding.
+      </li>
+      <li>
+        <strong>Open weights reduce vendor dependency.</strong> With model weights at github.com/deepseek-ai/DeepSeek-OCR-2,
+        teams can self-host inference and fine-tune on domain-specific document types - a significant
+        operational advantage over API-only alternatives for document-intensive applications.
+      </li>
+      <li>
+        <strong>Repetition rate as a production metric.</strong> The paper's inclusion of production
+        repetition rates alongside benchmark scores is methodologically noteworthy. It reflects a
+        commitment to measuring failure modes that matter in deployment, not just those that are
+        easy to quantify offline. More research papers should track and report this class of metric.
+      </li>
+    </ul>
+
+    <h2>My Take</h2>
+    <p>
+      The most interesting decision in this paper is the choice to use a language model as the vision
+      encoder rather than CLIP. On the surface this sounds expensive - Qwen2-0.5B is larger than
+      CLIP ViT-L/14 and was not designed for visual feature extraction. But the paper's argument is
+      structural: CLIP was trained to align global image representations with text captions, which
+      produces good semantic embeddings but poor spatial encodings. A language model trained to
+      predict next tokens from sequences is, by construction, trained to encode positional and
+      relational structure in sequences. Applying that to visual token sequences - even ones that
+      were not part of language pretraining - turns out to transfer better to document layout
+      understanding than CLIP's contrastive representations do.
+    </p>
+    <p>
+      The causal flow query mechanism is elegant but the paper does not provide strong ablations
+      isolating its contribution from the LLM encoder substitution itself. Both changes happen
+      together in DeepEncoder V2, and the benchmark numbers do not decompose how much of the
+      3.73% overall improvement comes from the encoder replacement versus the causal ordering
+      of the query outputs. This is a gap in the analysis that would be worth closing in follow-on
+      work.
+    </p>
+    <p>
+      The Newspaper category gap - text edit distance of 0.139 even after all improvements - is
+      an honest concession. Newspaper layouts involve non-standard column widths, narrow gutters,
+      mixed fonts, and irregular article boundaries. 250k training samples is not enough to learn
+      these patterns well, and the paper's attribution of this to data distribution rather than
+      architectural limitation seems correct. It also highlights a recurring issue in document AI:
+      the categories where the architecture works worst are often the ones that appear in the
+      highest volume in real enterprise deployments.
+    </p>
+    <p>
+      The discussion of cascading two 1D causal reasoners as a path to 2D reasoning is speculative
+      but worth taking seriously. The argument is that documents have been designed by humans to be
+      read linearly - reading order is not arbitrary but reflects the author's intended information
+      flow. A model that learns to sequence visual attention in a causally consistent manner is
+      therefore recovering something real about the structure of the document, not just performing
+      a compression trick. Whether this generalizes to non-document visual understanding tasks
+      is the genuinely open question.
+    </p>
+
+    <p>
+      <strong>Discussion question:</strong> DeepSeek-OCR 2 replaces CLIP ViT with Qwen2-0.5B as the
+      vision encoder and gets better document OCR. But CLIP was trained on image-text alignment across
+      general visual domains, while Qwen2-0.5B was trained entirely on text. Does the performance gain
+      reflect a genuine advantage of causal LLM encoders for structured document understanding, or does
+      it primarily reflect the larger parameter count and the fact that document layouts share more
+      structural properties with text sequences than with natural image distributions - and if so,
+      what happens to this advantage when the input is a natural scene rather than a typeset document?
+    </p>
+
+  </div>
+
+  <!-- SHARE SECTION -->
+  <div class="share-section">
+    <h3>Share this discussion</h3>
+    <div class="share-buttons">
+      <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fsatishkc7.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-09.html&title=DeepSeek-OCR%202%3A%20Visual%20Causal%20Flow"
+         target="_blank" rel="noopener" class="share-btn linkedin">
+        LinkedIn
+      </a>
+      <a href="https://twitter.com/intent/tweet?text=Week%2005%3A%20DeepSeek-OCR%202%20-%20Visual%20Causal%20Flow&url=https%3A%2F%2Fsatishkc7.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-09.html"
+         target="_blank" rel="noopener" class="share-btn twitter">
+        X / Twitter
+      </a>
+      <button class="share-btn copy" id="copy-btn" onclick="
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          this.textContent = 'Copied!';
+          setTimeout(() => { this.textContent = 'Copy Link'; }, 2000);
+        });
+      ">
+        Copy Link
+      </button>
+    </div>
+  </div>
+
+  <!-- POST NAVIGATION -->
+  <div class="post-nav">
+    <a href="../index.html">&#8592; Back to all papers</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <a href="../about.html">About</a>
+      <a href="https://github.com/satishkc7" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://linkedin.com/in/satishkc7" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <p>&copy; 2026 AI &amp; Automation Chronicle &middot; Built by <a href="https://github.com/satishkc7" target="_blank" rel="noopener">Satish K C</a></p>
+  </footer>
+
+  <!-- READING PROGRESS SCRIPT -->
+  <script>
+    const bar = document.getElementById('progress-bar');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = docHeight > 0 ? (scrollTop / docHeight * 100) + '%' : '0%';
+    });
+  </script>
+
+</body>
+</html>

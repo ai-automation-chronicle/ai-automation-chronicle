@@ -43,7 +43,7 @@
   <div class="stats-bar">
     <div class="stats-bar-inner">
       <div class="stat-item">
-        <span class="stat-number">4</span>
+        <span class="stat-number">5</span>
         <span class="stat-label">Research Papers</span>
       </div>
       <div class="stat-divider"></div>
@@ -686,6 +686,82 @@
             <span class="tag green">Efficiency</span>
             <span class="tag orange">Optimization</span>
             <span class="read-time">15 min read</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- PAPER CARD — Week 09 / Week 05 Research -->
+      <a href="posts/week-09.html" class="paper-card" data-tab="research">
+        <div class="paper-card-placeholder" style="background:none;padding:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 170" width="100%" height="170" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="w09bg" x1="0" y1="0" x2="400" y2="170" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#04101E"/>
+                <stop offset="100%" stop-color="#0A1520"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="170" fill="url(#w09bg)"/>
+            <!-- Subtle grid -->
+            <g stroke="#0E1828" stroke-width="0.6">
+              <line x1="0" y1="56" x2="400" y2="56"/>
+              <line x1="0" y1="112" x2="400" y2="112"/>
+              <line x1="100" y1="0" x2="100" y2="153"/>
+              <line x1="200" y1="0" x2="200" y2="153"/>
+              <line x1="300" y1="0" x2="300" y2="153"/>
+            </g>
+            <!-- Document outline -->
+            <rect x="20" y="18" width="100" height="118" rx="3" fill="#060E1A" stroke="#1D5080" stroke-width="1"/>
+            <!-- Raster scan rows (grey - old approach) -->
+            <rect x="28" y="28" width="84" height="5" rx="1" fill="#1D5080" opacity="0.25"/>
+            <rect x="28" y="36" width="84" height="5" rx="1" fill="#1D5080" opacity="0.25"/>
+            <rect x="28" y="44" width="84" height="5" rx="1" fill="#1D5080" opacity="0.25"/>
+            <rect x="28" y="52" width="84" height="5" rx="1" fill="#1D5080" opacity="0.25"/>
+            <rect x="28" y="60" width="84" height="5" rx="1" fill="#1D5080" opacity="0.25"/>
+            <!-- Causal scan path (orange - new approach) -->
+            <!-- Highlight a semantic region first -->
+            <rect x="28" y="68" width="52" height="14" rx="2" fill="#E04D14" opacity="0.15" stroke="#E04D14" stroke-width="0.8"/>
+            <text x="54" y="78" text-anchor="middle" font-family="monospace" font-size="6.5" fill="#E04D14">FORMULA</text>
+            <rect x="28" y="88" width="84" height="8" rx="2" fill="#E04D14" opacity="0.08" stroke="#E04D14" stroke-width="0.5"/>
+            <text x="70" y="95" text-anchor="middle" font-family="monospace" font-size="5.5" fill="#E07040">TABLE HEADER</text>
+            <rect x="28" y="102" width="84" height="26" rx="2" fill="#1D5080" opacity="0.08" stroke="#1D5080" stroke-width="0.5"/>
+            <text x="70" y="118" text-anchor="middle" font-family="monospace" font-size="5.5" fill="#5AAAD0">BODY TEXT</text>
+            <!-- Causal flow arrows (semantic order) -->
+            <path d="M88,75 C130,70 160,60 190,50" fill="none" stroke="#E04D14" stroke-width="1.5" opacity="0.7"/>
+            <path d="M112,92 C145,88 168,75 190,62" fill="none" stroke="#E04D14" stroke-width="1.2" opacity="0.5"/>
+            <path d="M112,115 C145,108 168,90 190,75" fill="none" stroke="#3A8EC8" stroke-width="1" opacity="0.4"/>
+            <!-- Causal query block (center) -->
+            <rect x="190" y="30" width="80" height="110" rx="4" fill="#060E1A" stroke="#E04D14" stroke-width="1.2"/>
+            <text x="230" y="50" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#E04D14" font-weight="700">CAUSAL</text>
+            <text x="230" y="62" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#E04D14" font-weight="700">FLOW</text>
+            <text x="230" y="74" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#E04D14" font-weight="700">QUERIES</text>
+            <!-- Query count labels -->
+            <text x="230" y="94" text-anchor="middle" font-family="monospace" font-size="6" fill="#5AAAD0">256 (global)</text>
+            <text x="230" y="106" text-anchor="middle" font-family="monospace" font-size="6" fill="#5AAAD0">144 / crop</text>
+            <text x="230" y="118" text-anchor="middle" font-family="monospace" font-size="6" fill="#5AAAD0">max: 1120</text>
+            <!-- Arrow to decoder -->
+            <line x1="270" y1="85" x2="302" y2="85" stroke="#E04D14" stroke-width="1.8" opacity="0.8"/>
+            <!-- MoE Decoder box -->
+            <rect x="302" y="54" width="76" height="62" rx="4" fill="#0A0818" stroke="#3A2A80" stroke-width="1.2"/>
+            <text x="340" y="74" text-anchor="middle" font-family="monospace" font-size="7" fill="#8870D0">MoE</text>
+            <text x="340" y="86" text-anchor="middle" font-family="monospace" font-size="7" fill="#8870D0">DECODER</text>
+            <text x="340" y="100" text-anchor="middle" font-family="monospace" font-size="6" fill="#5AAAD0">3B / 500M</text>
+            <text x="340" y="110" text-anchor="middle" font-family="monospace" font-size="6" fill="#5AAAD0">active</text>
+            <!-- Encoder label -->
+            <text x="120" y="148" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="6.5" fill="#5AAAD0" letter-spacing="0.5">Qwen2-0.5B ENCODER</text>
+            <!-- Bottom label strip -->
+            <rect x="0" y="153" width="400" height="17" fill="#030810" opacity="0.95"/>
+            <text x="200" y="164" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7.5" fill="#5AAAD0" letter-spacing="2.5">VISUAL CAUSAL FLOW · DEEPSEEK-OCR 2 · ARXIV 2026</text>
+          </svg>
+        </div>
+        <div class="paper-card-body">
+          <div class="paper-week">Week 05 &middot; March 2026</div>
+          <h3>DeepSeek-OCR 2: Visual Causal Flow</h3>
+          <p>DeepSeek AI replaces CLIP ViT with Qwen2-0.5B as the vision encoder and introduces causal flow queries that attend to document regions in semantic order. Achieves 91.09% on OmniDocBench v1.5 and outperforms Gemini-3 Pro at the same 1,120-token budget.</p>
+          <div class="paper-meta">
+            <span class="tag">Deep Learning</span>
+            <span class="tag green">Transformers</span>
+            <span class="tag purple">NLP</span>
+            <span class="read-time">14 min read</span>
           </div>
         </div>
       </a>
