@@ -48,7 +48,7 @@
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
-        <span class="stat-number">4</span>
+        <span class="stat-number">5</span>
         <span class="stat-label">Articles Published</span>
       </div>
       <div class="stat-divider"></div>
@@ -762,6 +762,88 @@
             <span class="tag green">Transformers</span>
             <span class="tag purple">NLP</span>
             <span class="read-time">14 min read</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- PAPER CARD — Week 10 / Article 05 -->
+      <a href="posts/week-10.html" class="paper-card" data-tab="practice">
+        <div class="paper-card-placeholder" style="background:none;padding:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 170" width="100%" height="170" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="w10bg" x1="0" y1="0" x2="400" y2="170" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#04101E"/>
+                <stop offset="100%" stop-color="#0E0420"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="170" fill="url(#w10bg)"/>
+            <!-- Document outline -->
+            <rect x="18" y="16" width="88" height="116" rx="4" fill="#060E1A" stroke="#1D5080" stroke-width="1"/>
+            <!-- Document content rows (simulating text/table) -->
+            <rect x="26" y="26" width="72" height="5" rx="1.5" fill="#1D5080" opacity="0.35"/>
+            <rect x="26" y="35" width="55" height="4" rx="1.5" fill="#1D5080" opacity="0.2"/>
+            <!-- Table block highlighted (orange) -->
+            <rect x="26" y="46" width="72" height="28" rx="2" fill="#E04D14" opacity="0.1" stroke="#E04D14" stroke-width="0.8"/>
+            <rect x="26" y="46" width="72" height="6" rx="1" fill="#E04D14" opacity="0.2"/>
+            <line x1="26" y1="52" x2="98" y2="52" stroke="#E04D14" stroke-width="0.5" opacity="0.4"/>
+            <line x1="26" y1="58" x2="98" y2="58" stroke="#1D5080" stroke-width="0.4" opacity="0.3"/>
+            <line x1="26" y1="64" x2="98" y2="64" stroke="#1D5080" stroke-width="0.4" opacity="0.3"/>
+            <line x1="62" y1="46" x2="62" y2="74" stroke="#1D5080" stroke-width="0.4" opacity="0.3"/>
+            <!-- Chart block highlighted (blue) -->
+            <rect x="26" y="80" width="72" height="30" rx="2" fill="#1D5080" opacity="0.12" stroke="#3A8EC8" stroke-width="0.8"/>
+            <path d="M30,106 L42,98 L54,102 L66,88 L78,94 L90,84" fill="none" stroke="#3A8EC8" stroke-width="1.5" opacity="0.8"/>
+            <!-- KVP fields -->
+            <rect x="26" y="116" width="30" height="4" rx="1" fill="#E04D14" opacity="0.35"/>
+            <rect x="60" y="116" width="38" height="4" rx="1" fill="#4b5563" opacity="0.5"/>
+            <rect x="26" y="124" width="24" height="4" rx="1" fill="#E04D14" opacity="0.35"/>
+            <rect x="54" y="124" width="44" height="4" rx="1" fill="#4b5563" opacity="0.5"/>
+            <!-- Arrow to model -->
+            <line x1="106" y1="74" x2="148" y2="74" stroke="#E04D14" stroke-width="2" opacity="0.8"/>
+            <polygon points="148,70 158,74 148,78" fill="#E04D14" opacity="0.8"/>
+            <!-- Model box (center) -->
+            <rect x="158" y="48" width="106" height="52" rx="6" fill="#071e3d" stroke="#1d4ed8" stroke-width="1.5"/>
+            <text x="211" y="68" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8.5" fill="#60a5fa" font-weight="700">Granite 4.0</text>
+            <text x="211" y="80" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8.5" fill="#60a5fa" font-weight="700">3B Vision</text>
+            <text x="211" y="92" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#4b5563">SigLIP2 + Deepstack</text>
+            <!-- IBM badge -->
+            <rect x="163" y="52" width="22" height="10" rx="5" fill="#1d4ed8" opacity="0.4"/>
+            <text x="174" y="60" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="6" fill="#93c5fd" font-weight="700">IBM</text>
+            <!-- Arrow to outputs -->
+            <line x1="264" y1="74" x2="280" y2="74" stroke="#22c55e" stroke-width="2" opacity="0.8"/>
+            <polygon points="280,70 290,74 280,78" fill="#22c55e" opacity="0.8"/>
+            <!-- Output box 1: CSV -->
+            <rect x="290" y="24" width="92" height="26" rx="4" fill="#052e16" stroke="#15803d" stroke-width="1"/>
+            <text x="306" y="38" font-family="'Courier New',monospace" font-size="7.5" fill="#4ade80">CSV</text>
+            <text x="336" y="38" font-family="Inter,Arial,sans-serif" font-size="7" fill="#4b5563">chart data</text>
+            <!-- Output box 2: JSON -->
+            <rect x="290" y="55" width="92" height="26" rx="4" fill="#071828" stroke="#1d4ed8" stroke-width="1"/>
+            <text x="306" y="69" font-family="'Courier New',monospace" font-size="7.5" fill="#60a5fa">JSON</text>
+            <text x="336" y="69" font-family="Inter,Arial,sans-serif" font-size="7" fill="#4b5563">table struct</text>
+            <!-- Output box 3: KVP -->
+            <rect x="290" y="86" width="92" height="26" rx="4" fill="#1e0a3a" stroke="#7e22ce" stroke-width="1"/>
+            <text x="306" y="100" font-family="'Courier New',monospace" font-size="7.5" fill="#d8b4fe">KVP</text>
+            <text x="336" y="100" font-family="Inter,Arial,sans-serif" font-size="7" fill="#4b5563">key-value</text>
+            <!-- Output box 4: Code -->
+            <rect x="290" y="117" width="92" height="26" rx="4" fill="#1c0800" stroke="#E04D14" stroke-width="1"/>
+            <text x="306" y="131" font-family="'Courier New',monospace" font-size="7.5" fill="#fdba74">PY</text>
+            <text x="328" y="131" font-family="Inter,Arial,sans-serif" font-size="7" fill="#4b5563">chart code</text>
+            <!-- Accuracy badge -->
+            <rect x="152" y="108" width="62" height="20" rx="10" fill="#E04D14" opacity="0.2"/>
+            <text x="183" y="122" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8" fill="#E04D14" font-weight="700">85.5% KVP</text>
+            <!-- Bottom label strip -->
+            <rect x="0" y="153" width="400" height="17" fill="#030810" opacity="0.95"/>
+            <text x="200" y="164" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7.5" fill="#5AAAD0" letter-spacing="2">GRANITE 4.0 3B VISION · IBM RESEARCH · DOCUMENT EXTRACTION</text>
+          </svg>
+        </div>
+        <div class="paper-card-body">
+          <div class="paper-week">Article 05 &middot; April 2026</div>
+          <h3>IBM Granite 4.0 3B Vision: The Compact VLM Built for Document Extraction</h3>
+          <p>IBM Research's 4B-parameter VLM turns charts, tables, and invoices into structured data with a single tag-driven API call. 85.5% KVP accuracy zero-shot, Apache 2.0, and vLLM-native.</p>
+          <div class="paper-meta">
+            <span class="tag orange">Agents</span>
+            <span class="tag green">Automation</span>
+            <span class="tag">Vision AI</span>
+            <span class="read-time">11 min read</span>
           </div>
         </div>
       </a>
