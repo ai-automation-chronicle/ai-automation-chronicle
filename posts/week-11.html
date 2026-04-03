@@ -640,10 +640,12 @@
       function pickVoice() {
         const voices = speechSynthesis.getVoices();
         const preferred = [
-          'Google US English',
-          'Samantha',
-          'Microsoft Zira Desktop',
-          'Microsoft David Desktop'
+          'Google UK English Male',
+          'Daniel',
+          'Alex',
+          'Microsoft David Desktop',
+          'Microsoft Mark Desktop',
+          'Google US English'
         ];
         for (const name of preferred) {
           const v = voices.find(function(v) { return v.name === name; });
