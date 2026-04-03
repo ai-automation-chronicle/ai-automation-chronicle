@@ -191,6 +191,21 @@
     </div>
   </div>
 
+  <!-- TTS PLAYER -->
+  <div class="tts-player">
+    <div class="tts-player-inner">
+      <div class="tts-left">
+        <span class="tts-icon">&#128266;</span>
+        <span class="tts-label">Listen to this article</span>
+        <span class="tts-duration">9 min read</span>
+      </div>
+      <div class="tts-controls">
+        <button class="tts-btn tts-play" id="tts-play">&#9654; Play</button>
+        <button class="tts-btn tts-stop" id="tts-stop" disabled>&#9632; Stop</button>
+      </div>
+    </div>
+  </div>
+
   <!-- POST BODY -->
   <div class="post-body">
 
@@ -559,6 +574,89 @@
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       bar.style.width = docHeight > 0 ? (scrollTop / docHeight * 100) + '%' : '0%';
     });
+  </script>
+
+  <!-- TTS SCRIPT -->
+  <script>
+    (function () {
+      const playBtn = document.getElementById('tts-play');
+      const stopBtn = document.getElementById('tts-stop');
+      let paused = false;
+
+      function pickVoice() {
+        const voices = speechSynthesis.getVoices();
+        const preferred = [
+          'Google US English',
+          'Samantha',
+          'Microsoft Zira Desktop',
+          'Microsoft David Desktop'
+        ];
+        for (const name of preferred) {
+          const v = voices.find(function(v) { return v.name === name; });
+          if (v) return v;
+        }
+        return voices.find(function(v) { return v.lang === 'en-US'; }) ||
+               voices.find(function(v) { return v.lang.startsWith('en'); }) ||
+               voices[0] || null;
+      }
+
+      function getArticleText() {
+        const body = document.querySelector('.post-body');
+        if (!body) return '';
+        const clone = body.cloneNode(true);
+        clone.querySelectorAll('pre, code, .diagram-wrap, .diagram-title, figcaption, .tag').forEach(function(el) {
+          el.remove();
+        });
+        return clone.innerText || clone.textContent || '';
+      }
+
+      function resetUI() {
+        playBtn.textContent = '\u25B6 Play';
+        playBtn.disabled = false;
+        stopBtn.disabled = true;
+        paused = false;
+      }
+
+      function startSpeech() {
+        speechSynthesis.cancel();
+        const text = getArticleText();
+        if (!text.trim()) return;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.95;
+        utterance.pitch = 1;
+        const voice = pickVoice();
+        if (voice) utterance.voice = voice;
+        utterance.onend = resetUI;
+        utterance.onerror = resetUI;
+        speechSynthesis.speak(utterance);
+        playBtn.textContent = '\u23F8 Pause';
+        stopBtn.disabled = false;
+        paused = false;
+      }
+
+      playBtn.addEventListener('click', function () {
+        if (speechSynthesis.speaking && !paused) {
+          speechSynthesis.pause();
+          paused = true;
+          playBtn.textContent = '\u25B6 Resume';
+        } else if (paused) {
+          speechSynthesis.resume();
+          paused = false;
+          playBtn.textContent = '\u23F8 Pause';
+        } else {
+          startSpeech();
+        }
+      });
+
+      stopBtn.addEventListener('click', function () {
+        speechSynthesis.cancel();
+        resetUI();
+      });
+
+      if (typeof speechSynthesis.onvoiceschanged !== 'undefined') {
+        speechSynthesis.onvoiceschanged = function () {};
+      }
+    })();
   </script>
 
 </body>
