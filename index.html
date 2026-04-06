@@ -43,7 +43,7 @@
   <div class="stats-bar">
     <div class="stats-bar-inner">
       <div class="stat-item">
-        <span class="stat-number">5</span>
+        <span class="stat-number">6</span>
         <span class="stat-label">Research Papers</span>
       </div>
       <div class="stat-divider"></div>
@@ -84,6 +84,81 @@
       <div class="month-separator" data-month-sep="true">
         <span>April 2026</span>
       </div>
+
+      <!-- PAPER CARD — Week 12 / Week 06 Research -->
+      <a href="posts/week-12.html" class="paper-card" data-tab="research">
+        <div class="paper-card-placeholder" style="background:none;padding:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 170" width="100%" height="170" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="w12bg" x1="0" y1="0" x2="400" y2="170" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#04101E"/>
+                <stop offset="100%" stop-color="#0C0A1A"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="170" fill="url(#w12bg)"/>
+            <!-- Grid -->
+            <g stroke="#121828" stroke-width="0.6">
+              <line x1="0" y1="56" x2="400" y2="56"/>
+              <line x1="0" y1="112" x2="400" y2="112"/>
+              <line x1="100" y1="0" x2="100" y2="170"/>
+              <line x1="200" y1="0" x2="200" y2="170"/>
+              <line x1="300" y1="0" x2="300" y2="170"/>
+            </g>
+            <!-- Pseudonymous profile nodes (left) -->
+            <circle cx="48" cy="38" r="16" fill="#081828" stroke="#1D5080" stroke-width="1.5"/>
+            <text x="48" y="35" text-anchor="middle" font-family="monospace" font-size="7" fill="#5AAAD0">HN</text>
+            <text x="48" y="46" text-anchor="middle" font-family="monospace" font-size="6" fill="#3A6A90">anon</text>
+            <circle cx="48" cy="85" r="16" fill="#081828" stroke="#1D5080" stroke-width="1.5"/>
+            <text x="48" y="82" text-anchor="middle" font-family="monospace" font-size="7" fill="#5AAAD0">RDT</text>
+            <text x="48" y="93" text-anchor="middle" font-family="monospace" font-size="6" fill="#3A6A90">anon</text>
+            <circle cx="48" cy="132" r="16" fill="#081828" stroke="#1D5080" stroke-width="1.5"/>
+            <text x="48" y="129" text-anchor="middle" font-family="monospace" font-size="7" fill="#5AAAD0">FRM</text>
+            <text x="48" y="140" text-anchor="middle" font-family="monospace" font-size="6" fill="#3A6A90">anon</text>
+            <!-- ESRC pipeline boxes (center) -->
+            <rect x="130" y="18" width="68" height="18" rx="3" fill="#0A1828" stroke="#1D5080" stroke-width="0.8"/>
+            <text x="164" y="31" text-anchor="middle" font-family="monospace" font-size="7.5" fill="#5AAAD0" letter-spacing="1">EXTRACT</text>
+            <rect x="130" y="44" width="68" height="18" rx="3" fill="#0A1828" stroke="#1D5080" stroke-width="0.8"/>
+            <text x="164" y="57" text-anchor="middle" font-family="monospace" font-size="7.5" fill="#5AAAD0" letter-spacing="1">SEARCH</text>
+            <rect x="130" y="70" width="68" height="18" rx="3" fill="#1A0800" stroke="#E04D14" stroke-width="1"/>
+            <text x="164" y="83" text-anchor="middle" font-family="monospace" font-size="7.5" fill="#E04D14" letter-spacing="1">REASON</text>
+            <rect x="130" y="96" width="68" height="18" rx="3" fill="#0A1828" stroke="#1D5080" stroke-width="0.8"/>
+            <text x="164" y="109" text-anchor="middle" font-family="monospace" font-size="7" fill="#5AAAD0" letter-spacing="0.8">CALIBRATE</text>
+            <!-- Flow arrows through pipeline -->
+            <line x1="164" y1="36" x2="164" y2="44" stroke="#3A8EC8" stroke-width="1" opacity="0.7"/>
+            <line x1="164" y1="62" x2="164" y2="70" stroke="#3A8EC8" stroke-width="1" opacity="0.7"/>
+            <line x1="164" y1="88" x2="164" y2="96" stroke="#E04D14" stroke-width="1.2" opacity="0.8"/>
+            <!-- Input lines from profiles to pipeline -->
+            <line x1="64" y1="38" x2="130" y2="27" stroke="#3A8EC8" stroke-width="0.9" opacity="0.5" stroke-dasharray="3,2"/>
+            <line x1="64" y1="85" x2="130" y2="53" stroke="#3A8EC8" stroke-width="0.9" opacity="0.5" stroke-dasharray="3,2"/>
+            <line x1="64" y1="132" x2="130" y2="100" stroke="#3A8EC8" stroke-width="0.9" opacity="0.4" stroke-dasharray="3,2"/>
+            <!-- Output arrow from pipeline to identity -->
+            <line x1="198" y1="79" x2="268" y2="79" stroke="#E04D14" stroke-width="2" opacity="0.85"/>
+            <polygon points="268,75 278,79 268,83" fill="#E04D14" opacity="0.85"/>
+            <!-- Revealed identity node (right, orange glow) -->
+            <circle cx="318" cy="79" r="28" fill="#E04D14" opacity="0.07"/>
+            <circle cx="318" cy="79" r="18" fill="#1A0800" stroke="#E04D14" stroke-width="2.2"/>
+            <text x="318" y="75" text-anchor="middle" font-family="monospace" font-size="7" fill="#E04D14">REAL</text>
+            <text x="318" y="86" text-anchor="middle" font-family="monospace" font-size="7" fill="#E04D14">ID</text>
+            <!-- Precision label -->
+            <rect x="270" y="108" width="92" height="14" rx="3" fill="#100500" stroke="#E04D14" stroke-width="0.6" opacity="0.7"/>
+            <text x="316" y="119" text-anchor="middle" font-family="monospace" font-size="6.5" fill="#E07040">68% recall @ 90% prec</text>
+            <!-- Bottom label strip -->
+            <rect x="0" y="153" width="400" height="17" fill="#030810" opacity="0.95"/>
+            <text x="200" y="164" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7.5" fill="#5AAAD0" letter-spacing="2.5">ESRC FRAMEWORK - CROSS-PLATFORM DEANONYMIZATION - ARXIV 2026</text>
+          </svg>
+        </div>
+        <div class="paper-card-body">
+          <div class="paper-week">Week 06 &middot; April 2026</div>
+          <h3>Large-scale Online Deanonymization with LLMs</h3>
+          <p>Researchers from MATS, ETH Zurich, and Anthropic show that an LLM pipeline achieves 68% recall at 90% precision re-identifying pseudonymous users - compared to near 0% for all prior methods. Practical obscurity no longer holds.</p>
+          <div class="paper-meta">
+            <span class="tag purple">LLMs</span>
+            <span class="tag orange">Security</span>
+            <span class="tag">Privacy</span>
+            <span class="read-time">16 min read</span>
+          </div>
+        </div>
+      </a>
 
       <!-- PAPER CARD — Week 11 / Article 06 -->
       <a href="posts/week-11.html" class="paper-card" data-tab="practice">
