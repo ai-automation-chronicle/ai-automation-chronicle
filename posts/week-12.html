@@ -49,7 +49,7 @@
       <h1>Large-scale Online Deanonymization with LLMs</h1>
       <div class="post-header-meta">
         <span>April 5, 2026 &middot; by Satish K C</span>
-        <span>16 min read</span>
+        <span>7 min read</span>
       </div>
       <div class="post-header-tags">
         <span class="tag purple">LLMs</span>
@@ -68,13 +68,11 @@
       (v2: February 25, 2026) by Simon Lermen, Daniel Paleka, Joshua Swanson, Michael Aerni, Nicholas Carlini,
       and Florian Tram&egrave;r. The authors are affiliated with MATS (Machine Learning Alignment Theory Scholars),
       ETH Zurich, and Anthropic. The paper appears under cs.CR (Cryptography and Security), cs.AI, and cs.LG.
-      It is 24 pages with 10 figures and is released under CC BY 4.0.
-    </p>
-    <p>
-      The paper's central claim is direct: LLM agents equipped with internet access can re-identify pseudonymous
-      online users at scale, with precision-recall characteristics that make the attack practically usable.
-      The best prior non-LLM methods achieve near 0% recall at 90% precision. The authors' pipeline achieves
-      up to 68% recall at the same precision threshold. The conclusion the authors draw is equally direct:
+      It is 24 pages with 10 figures and is released under CC BY 4.0. The paper's central claim is direct:
+      LLM agents equipped with internet access can re-identify pseudonymous online users at scale, with
+      precision-recall characteristics that make the attack practically usable. The best prior non-LLM methods
+      achieve near 0% recall at 90% precision. The authors' pipeline achieves up to 68% recall at the same
+      precision threshold. The conclusion the authors draw is equally direct:
       <em>"practical obscurity protecting pseudonymous users online no longer holds."</em>
     </p>
     <a href="https://arxiv.org/abs/2602.16800" target="_blank" rel="noopener" class="paper-link">
@@ -83,237 +81,66 @@
 
     <h2>The Problem Before This Paper</h2>
     <p>
-      The privacy guarantee behind pseudonymous online accounts has never been cryptographic. It has been
-      practical obscurity - the idea that linking a Reddit username to a real identity requires effort
-      that exceeds what any attacker is realistically willing to spend. That assumption held for roughly
-      two decades because the attack surface was genuinely hard to exploit at scale.
-    </p>
-    <p>
-      The canonical prior work is Narayanan and Shmatikov's 2008 Netflix Prize deanonymization, which showed
-      that a small number of movie ratings could uniquely identify individuals by cross-referencing with
-      public IMDb data. That attack was elegant but narrow: it required structured, numerical data and
-      a specific kind of auxiliary dataset. Unstructured text - forum posts, comments, pseudonymous
-      interview transcripts - was not amenable to the same approach. Human analysts could manually
-      identify individuals through stylometry and biographical detail accumulation, but this did not
-      scale to millions of accounts.
-    </p>
-    <p>
-      Sweeney's k-anonymity work, and subsequent l-diversity and t-closeness extensions, addressed
-      structured database deanonymization through formal guarantees. These frameworks assume an adversary
-      operating on tabular data. They offer no protection against an agent that reads natural language
-      and reasons over it.
-    </p>
-    <p>
-      The gap the authors identify is precise: there was no scalable attack that worked on unstructured
-      text profiles and did not require substantial manual effort or specialized structured datasets.
-      LLMs close that gap.
+      Pseudonymous online accounts have historically relied on practical obscurity - the assumption that
+      linking a username to a real identity required structured data or substantial manual effort. Classical
+      deanonymization approaches like Narayanan and Shmatikov's Netflix Prize attack worked on structured,
+      numerical datasets and did not generalize to unstructured text. Forum posts, comments, and pseudonymous
+      transcripts required human analysis and did not scale. LLMs remove that constraint.
     </p>
 
     <h2>What They Built</h2>
     <p>
-      The authors introduce the <strong>ESRC framework</strong> - a four-stage pipeline for scalable
-      deanonymization. The stages are Extract, Search, Reason, and Calibrate.
-    </p>
-    <ul>
-      <li>
-        <strong>Extract.</strong> An LLM reads a pseudonymous user's posts and generates a semi-structured
-        biographical profile capturing identity-relevant features: location signals, professional background,
-        interests, writing style markers, temporal patterns. The output is a condensed profile suitable
-        for downstream comparison.
-      </li>
-      <li>
-        <strong>Search.</strong> Dense embeddings of the extracted profile are used to perform nearest-neighbor
-        retrieval over a candidate pool. This stage does not produce a final match - it retrieves a shortlist
-        of the top-K candidates from a large corpus, reducing the comparison problem from millions to dozens.
-      </li>
-      <li>
-        <strong>Reason.</strong> An LLM with extended reasoning capability compares the extracted profile
-        against each candidate in the shortlist. This is not keyword matching - the model reasons over
-        biographical plausibility, reconciling partial information and inconsistencies to select the most
-        likely match.
-      </li>
-      <li>
-        <strong>Calibrate.</strong> Confidence scores from embeddings or LLM-produced probability estimates
-        are used to set a precision-recall operating point. An attacker who wants 90% precision operates
-        at one threshold; an attacker who wants 99% precision operates at a stricter one, with lower recall.
-      </li>
-    </ul>
-    <p>
-      In the agentic variant of the attack, the LLM has full internet access and performs all stages
-      end-to-end, including web search, profile scraping, and cross-platform candidate retrieval.
-    </p>
-    <p>
-      The precision formula used to evaluate difficulty parameters across varying match scenarios is:
-    </p>
-    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #E04D14;">
-      Precision(&pi;) = (&pi; &middot; TPR) / (&pi; &middot; TPR + &pi; &middot; FMR + (1 - &pi;) &middot; FPIR)
-    </p>
-    <p>
-      Where &pi; is the prior probability that a query user has a match in the candidate pool, TPR is
-      the true positive rate, FMR is the false match rate on matchable queries, and FPIR is the false
-      positive identification rate on non-matchable queries. This formulation captures how real-world
-      deployment differs from controlled evaluation: in practice, most queries will not have a match
-      in the candidate pool, which inflates false positive rates and suppresses precision.
-    </p>
-    <p>
-      The models used across the pipeline: Gemini embeddings and Gemini 3 Flash for extraction and
-      initial filtering, Grok 4.1 Fast for selection, GPT-5.2 for reasoning-intensive verification,
-      and GPT-5-mini for pairwise tournament comparisons.
+      The authors introduce the <strong>ESRC framework</strong> - a four-stage pipeline: Extract (an LLM
+      summarizes posts into a biographical profile), Search (dense embeddings retrieve a candidate shortlist
+      from a large pool), Reason (an LLM compares the profile against shortlisted candidates and selects
+      the best match), and Calibrate (confidence scoring sets the operating precision-recall point). An
+      agentic variant runs the full pipeline autonomously with internet access and no predefined candidate pool.
     </p>
 
     <h2>Key Findings</h2>
     <ul>
-      <li>
-        LLM-based deanonymization achieves 54% recall at 90% precision on cross-platform matching
-        (Hacker News to LinkedIn), compared to 0.1% for the Narayanan-Shmatikov classical baseline
-        on the same dataset. The gap is not marginal - it is a qualitative change in what the attack
-        can accomplish.
-      </li>
-      <li>
-        The attack scales across three structurally different evaluation settings: cross-platform profile
-        linking (HN to LinkedIn), within-platform community-split matching (Reddit), and temporal-split
-        matching (same user, different time periods). The pipeline architecture generalizes across all three.
-      </li>
-      <li>
-        Increasing reasoning effort - using a more capable model or more inference compute for the Reason
-        stage - consistently improves recall at fixed precision. This provides evidence that the gains
-        come from genuine reasoning over biographical content, not memorization of user identities from
-        training data.
-      </li>
-      <li>
-        The agentic variant, with full internet access and no predefined candidate pool, achieves 67% recall
-        at 90% precision on a set of 338 Hacker News users - re-identifying 226 of them correctly.
-      </li>
-      <li>
-        The attack partially transfers to targets with significantly less public information: 27% recall at
-        82% precision on 33 Anthropic Interviewer participants, whose primary identifier was an interview
-        transcript.
-      </li>
-      <li>
-        Precision degrades predictably as the fraction of matchable queries (&pi;) decreases and candidate
-        pool size (K) increases. The paper provides scaling curves that allow practitioners to estimate
-        attack precision in realistic deployment conditions.
-      </li>
+      <li>LLM reasoning over biographical profiles drives the majority of the recall gain - embedding search alone achieves 26% recall at 90% precision; adding the Reason stage pushes this to 54-55% on the same task.</li>
+      <li>The pipeline generalizes across three evaluation settings: cross-platform linking (HN to LinkedIn), within-platform community splits (Reddit), and temporal profile splits.</li>
+      <li>Increasing reasoning effort - more capable models or more inference compute at the Reason stage - consistently improves recall, providing evidence that gains come from reasoning rather than memorization.</li>
+      <li>The agentic variant with internet access achieves 67% recall at 90% precision on Hacker News users and 27% recall at 82% precision on Anthropic Interviewer participants from transcript alone.</li>
     </ul>
 
     <h2>Results</h2>
     <p>
-      The authors evaluate across three primary datasets. The HN-LinkedIn dataset contains 987 ground-truth
-      matches drawn from approximately 89,000 Hacker News user profiles. The Reddit movie dataset contains
-      9,781 users distributed across r/movies and five specialty communities. The temporal Reddit dataset
-      contains 15,000 profiles split across time (5,000 matchable queries, 5,000 query distractors,
-      5,000 candidate distractors).
-    </p>
-    <p><strong>Hacker News to LinkedIn (987 queries, ~89,000 candidate pool):</strong></p>
-    <ul>
-      <li>Narayanan baseline: 0.1% recall at 90% precision / 0.1% at 99% precision</li>
-      <li>Search (embedding only): 26.3% recall at 90% precision / 4.4% at 99% precision</li>
-      <li>Search + Reason (low effort): 55.0% recall at 90% precision / 36.0% at 99% precision</li>
-      <li>Search + Reason (high effort): 54.2% recall at 90% precision / 45.1% at 99% precision</li>
-    </ul>
-    <p><strong>Reddit movie communities (9,781 candidates):</strong></p>
-    <ul>
-      <li>Classical baseline: approximately 0% at both precision thresholds</li>
-      <li>Search + Reason (low effort): 5.2% recall at 90% precision / 1.4% at 99% precision</li>
-      <li>Search + Reason (high effort): 8.5% recall at 90% precision / 2.8% at 99% precision</li>
-      <li>Users sharing 10 or more movies: 48.1% recall at 90% precision</li>
-    </ul>
-    <p><strong>Temporal Reddit split (5,000 queries, 10,000 candidates):</strong></p>
-    <ul>
-      <li>Classical baseline: approximately 0% recall at 99% precision</li>
-      <li>Search + Reason + Calibrate: approximately 33% recall at 99% precision</li>
-      <li>Projected at 1 million candidates, 90% precision threshold: approximately 45% recall</li>
-    </ul>
-    <p><strong>Agentic approach with internet access:</strong></p>
-    <ul>
-      <li>Hacker News users: 226 correct identifications out of 338 attempts - 67% recall at 90% precision</li>
-      <li>Anthropic Interviewer participants: 9 correct out of 33 - approximately 27% recall at 82% precision</li>
-    </ul>
-    <p>
-      The authors note that ground-truth datasets may overestimate real-world success: users who publicly
-      link their accounts tend to share more identifying information than users who deliberately maintain
-      separation. The attack performance on truly anonymous users is likely lower than these figures suggest.
+      On the HN-LinkedIn dataset (987 matches, ~89,000 candidate pool): Search + Reason (high effort)
+      achieves 54.2% recall at 90% precision and 45.1% at 99% precision, versus 0.1% for the
+      Narayanan-Shmatikov baseline at both thresholds. On the temporal Reddit split (5,000 queries,
+      10,000 candidates): Search + Reason + Calibrate reaches approximately 33% recall at 99% precision,
+      with projections suggesting ~45% recall at 90% precision scaled to 1 million candidates.
     </p>
 
     <h2>Why This Matters for AI and Automation</h2>
     <p>
-      The practical obscurity assumption is embedded in how the internet is designed. Forum moderation,
-      whistleblower channels, pseudonymous research accounts, anonymous peer review systems, and
-      public-interest journalism sources all rely implicitly on the cost of deanonymization being
-      prohibitive. This paper removes that assumption.
+      The practical obscurity assumption underpins forum moderation, pseudonymous research accounts,
+      whistleblower channels, and anonymous peer review. This paper demonstrates that the assumption
+      fails against an automated LLM pipeline built from publicly available models and standard APIs.
+      Platform-level defenses designed for manual adversaries - rate limiting, pseudonymity policies,
+      surface-level text anonymization - do not address the attack surface this work exposes. The
+      threat is not hypothetical: the pipeline runs today on deployed models with no specialized
+      infrastructure required.
     </p>
-    <ul>
-      <li>
-        <strong>Any practitioner with API access</strong> can run a version of this attack using publicly
-        available models and standard embedding APIs. The pipeline requires no specialized infrastructure
-        and no access to private data.
-      </li>
-      <li>
-        <strong>Platform design must change.</strong> Rate limiting, shadow accounts, and pseudonymity
-        policies that assume manual adversaries are insufficient against an automated pipeline that
-        processes thousands of profiles per hour.
-      </li>
-      <li>
-        <strong>Differential privacy for text is unsolved.</strong> The attack succeeds precisely because
-        biographical signal accumulates across posts in ways that are difficult to sanitize without
-        destroying utility. Existing text anonymization tools operate on surface-level substitution
-        (replacing named entities) and are ineffective against reasoning-based linking.
-      </li>
-      <li>
-        <strong>The marginal risk framing matters for LLM developers.</strong> The authors argue that
-        this capability already exists in deployed models - the paper demonstrates it, but does not create
-        it. Responsible disclosure decisions in AI security increasingly require weighing whether
-        publication materially increases attack capability or primarily raises awareness and enables defense.
-      </li>
-      <li>
-        <strong>Temporal splitting reveals a specific vulnerability.</strong> Users who maintain consistent
-        writing style and biographical patterns across years of activity are more vulnerable than users
-        whose public persona shifts over time. This has direct implications for how communities should
-        think about long-term post archives.
-      </li>
-    </ul>
 
     <h2>My Take</h2>
     <p>
-      What makes this paper significant is not the specific recall numbers - which will improve as
-      reasoning models improve - but the architectural insight. The ESRC framework is not a novel
-      technical contribution in the sense of a new training procedure or architecture. It is a
-      demonstration that existing capabilities, composed correctly, cross a threshold that prior
-      work could not reach.
-    </p>
-    <p>
-      The Reason stage is the critical component. Embedding-based search alone achieves 26% recall
-      at 90% precision on the HN-LinkedIn task. Adding LLM reasoning over the shortlist pushes this
-      to 54-55%. The delta is entirely attributable to the model's ability to synthesize partial,
-      inconsistent biographical signals - exactly the kind of reasoning that scales directly with
-      model capability. As frontier models improve, this recall number will rise without any changes
-      to the pipeline.
-    </p>
-    <p>
-      The ethical considerations section is worth reading carefully. The authors obtained ERB approval
-      from ETH Zurich, used synthetic and anonymized evaluation datasets where possible, and chose
-      not to release the code or processed datasets. The decision to publish rests on a marginal-risk
-      argument: the capability exists in deployed models, the attack concept is not novel in principle,
-      and publication enables defenders to take the threat seriously. That framing is reasonable, but
-      it is also a framing that can justify almost any dual-use publication. The community has not yet
-      developed consensus norms for this category of security research.
-    </p>
-    <p>
-      The more uncomfortable implication is about existing archives. Every major forum - Reddit, Hacker News,
-      Stack Exchange, Twitter/X - has years of post history publicly accessible. The attack does not require
-      real-time access. A dataset collected today can be analyzed retroactively as models improve.
-      Users who relied on pseudonymity for professional or personal safety reasons did not consent
-      to being re-evaluated against future model capabilities.
+      The most consequential part of this paper is not the recall number - which will rise as
+      reasoning models improve - but the implication for existing archives. Every major public forum
+      has years of post history that can be analyzed retroactively as capabilities improve. Users who
+      relied on pseudonymity did not consent to re-evaluation against future model generations.
+      The authors chose to publish under a marginal-risk framing, arguing the capability already exists
+      in deployed models. That framing is reasonable, but it also sets a precedent the community has
+      not fully worked through yet.
     </p>
 
     <p>
-      <strong>Discussion question:</strong> The authors suggest that preventing this class of attack
-      appears challenging because the same data that enables community value also enables deanonymization.
-      Given that platform-level mitigations (rate limiting, API restrictions, stylometry obfuscation tools)
-      all operate on the assumption of a weaker adversary than a well-resourced LLM pipeline - do you
-      believe any technical mitigation can actually hold, or is the only viable path forward a legal
-      and regulatory framework that treats large-scale automated profile linking as a distinct category
-      of privacy violation?
+      <strong>Discussion question:</strong> Given that platform-level mitigations all assume a weaker
+      adversary than a well-resourced LLM pipeline, is there a viable technical defense - or is the
+      only durable path a legal and regulatory framework that treats large-scale automated profile
+      linking as a distinct category of privacy violation?
     </p>
 
   </div>
