@@ -65,21 +65,14 @@
 
     <h2>The Paper</h2>
     <p>
-      <strong>"DeepSeek-OCR 2: Visual Causal Flow"</strong> was submitted to arXiv on January 28, 2026
-      (arXiv:2601.20552v1) by <strong>Haoran Wei</strong>, <strong>Yaofeng Sun</strong>, and
-      <strong>Yukun Li</strong> from DeepSeek AI. The paper is licensed under CC BY 4.0 and the model
-      weights are publicly available at github.com/deepseek-ai/DeepSeek-OCR-2. As of publication it is
-      not yet accepted to a conference venue, but sits in the Computer Vision and Pattern Recognition
-      (cs.CV) category.
-    </p>
-    <p>
-      The core claim: raster-scan token ordering - the default processing order in virtually all vision
-      encoders - is architecturally mismatched with how semantic information is distributed in documents.
-      The paper introduces <strong>DeepEncoder V2</strong>, which replaces CLIP ViT with a language model
-      used as a vision encoder, equipped with learned causal flow queries that dynamically reorder attention
-      over visual tokens based on image semantics. On OmniDocBench v1.5, the system reaches
-      <strong>91.09% overall performance</strong>, a 3.73% improvement over DeepSeek-OCR v1, and
-      outperforms Gemini-3 Pro at an equal visual token budget of 1,120.
+      <strong>"DeepSeek-OCR 2: Visual Causal Flow"</strong> was published in January 2026 by Haoran Wei,
+      Yaofeng Sun, and Yukun Li from DeepSeek AI. The core claim: raster-scan token ordering - the default
+      processing order in virtually all vision encoders - is architecturally mismatched with how semantic
+      information is distributed in documents. The paper introduces <strong>DeepEncoder V2</strong>, which
+      replaces CLIP ViT with a language model used as a vision encoder, equipped with learned causal flow
+      queries that dynamically reorder attention over visual tokens based on image semantics. On
+      OmniDocBench v1.5, the system reaches <strong>91.09% overall performance</strong>, a 3.73%
+      improvement over v1, and outperforms Gemini-3 Pro at an equal visual token budget of 1,120.
     </p>
     <a href="https://arxiv.org/abs/2601.20552" target="_blank" rel="noopener" class="paper-link">
       Read the Paper on arXiv &#8594;

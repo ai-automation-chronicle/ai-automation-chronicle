@@ -65,21 +65,13 @@
     <h2>The Paper</h2>
     <p>
       <strong>"The Era of 1-bit LLMs: All Large Language Models are in 1.58 Bits"</strong> was published
-      on February 27, 2024 by a ten-person team at Microsoft Research: Shuming Ma, Hongyu Wang,
-      Lingxiao Ma, Lei Wang, Wenhui Wang, Shaohan Huang, Li Dong, Ruiping Wang, Jilong Xue, and
-      Furu Wei. The paper sits at the intersection of model quantization, hardware efficiency, and
-      large-scale language modeling - and its central claim is striking: a large language model where
-      every single weight is restricted to one of three values, <strong>{-1, 0, +1}</strong>, can
-      match a full-precision (FP16) model of the same size on both perplexity and downstream task
-      performance, while delivering dramatic improvements in latency, memory, throughput, and
-      energy consumption.
-    </p>
-    <p>
-      The name comes from information theory. Three possible values per weight requires
-      log<sub>2</sub>(3) bits to represent - which is approximately <strong>1.58 bits</strong>.
-      This is the theoretical minimum for a ternary representation. The paper argues this is not
-      just a compression trick but a fundamentally new and more efficient way to design and deploy
-      LLMs at scale.
+      in February 2024 by Shuming Ma, Hongyu Wang, Lingxiao Ma, Lei Wang, Wenhui Wang, Shaohan Huang,
+      Li Dong, Ruiping Wang, Jilong Xue, and Furu Wei at Microsoft Research. The central claim: a large
+      language model where every weight is restricted to <strong>{-1, 0, +1}</strong> can match a
+      full-precision FP16 model on perplexity and downstream tasks while delivering significant improvements
+      in latency, memory, throughput, and energy. The "1.58 bits" refers to log<sub>2</sub>(3) - the
+      theoretical minimum to represent three values - framing this not as a compression trick but as a
+      fundamentally more efficient paradigm for designing and deploying LLMs at scale.
     </p>
     <a href="https://arxiv.org/abs/2402.17764" target="_blank" rel="noopener" class="paper-link">
       Read the Paper on arXiv &#8594;
