@@ -10,6 +10,76 @@
   <title>AI & Automation Chronicle</title>
   <link rel="stylesheet" href="assets/css/style.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SWMR2ZGHJE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-SWMR2ZGHJE');
+  </script>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="index.html" class="nav-brand">AI & <span>Automation</span> Chronicle</a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="badge">Weekly Research Paper Discussions</div>
+      <h1>AI & <span>Automation</span> Chronicle</h1>
+      <p>In-depth breakdowns of the latest research in Artificial Intelligence, Data Science, and Automation. Written for practitioners who want to understand what actually matters.</p>
+    </div>
+  </section>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stats-bar-inner">
+      <div class="stat-item">
+        <span class="stat-number">5</span>
+        <span class="stat-label">Research Papers</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">6</span>
+        <span class="stat-label">Articles Published</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-number">2026</span>
+        <span class="stat-label">Est. Year</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAPERS LIST -->
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Latest Discussions</h2>
+      <div class="divider"></div>
+      <p class="section-subtitle">One research paper per week, broken down into clear and actionable insights for AI and automation practitioners.</p>
+    </div>
+
+    <div class="tabs-bar">
+      <button class="tab-btn active" data-tab="research" onclick="switchTab(this)">
+        <span class="tab-title">Research &amp; Ideas</span>
+        <span class="tab-subtitle">Weekly AI Research Paper Discussion</span>
+      </button>
+      <button class="tab-btn" data-tab="practice" onclick="switchTab(this)">
+        <span class="tab-title">AI &amp; Automation in Practice</span>
+        <span class="tab-subtitle">Tools, workflows &amp; real-world applications</span>
+      </button>
+    </div>
+
+    <div class="papers-grid">
+
 
       <div class="month-separator" data-month-sep="true">
         <span>April 2026</span>
@@ -783,75 +853,6 @@
           </div>
         </div>
       </a>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SWMR2ZGHJE"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-SWMR2ZGHJE');
-  </script>
-</head>
-<body>
-
-  <!-- NAVBAR -->
-  <nav>
-    <a href="index.html" class="nav-brand">AI & <span>Automation</span> Chronicle</a>
-    <ul class="nav-links">
-      <li><a href="index.html" class="active">Home</a></li>
-      <li><a href="about.html">About</a></li>
-    </ul>
-  </nav>
-
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="badge">Weekly Research Paper Discussions</div>
-      <h1>AI & <span>Automation</span> Chronicle</h1>
-      <p>In-depth breakdowns of the latest research in Artificial Intelligence, Data Science, and Automation. Written for practitioners who want to understand what actually matters.</p>
-    </div>
-  </section>
-
-  <!-- STATS BAR -->
-  <div class="stats-bar">
-    <div class="stats-bar-inner">
-      <div class="stat-item">
-        <span class="stat-number">5</span>
-        <span class="stat-label">Research Papers</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-number">6</span>
-        <span class="stat-label">Articles Published</span>
-      </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-number">2026</span>
-        <span class="stat-label">Est. Year</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- PAPERS LIST -->
-  <div class="container">
-    <div class="section-header">
-      <h2 class="section-title">Latest Discussions</h2>
-      <div class="divider"></div>
-      <p class="section-subtitle">One research paper per week, broken down into clear and actionable insights for AI and automation practitioners.</p>
-    </div>
-
-    <div class="tabs-bar">
-      <button class="tab-btn active" data-tab="research" onclick="switchTab(this)">
-        <span class="tab-title">Research &amp; Ideas</span>
-        <span class="tab-subtitle">Weekly AI Research Paper Discussion</span>
-      </button>
-      <button class="tab-btn" data-tab="practice" onclick="switchTab(this)">
-        <span class="tab-title">AI &amp; Automation in Practice</span>
-        <span class="tab-subtitle">Tools, workflows &amp; real-world applications</span>
-      </button>
-    </div>
-
-    <div class="papers-grid">
 
       <!-- PAPER CARD — duplicate this block each week -->
       <a href="posts/week-01.html" class="paper-card" data-tab="research">
