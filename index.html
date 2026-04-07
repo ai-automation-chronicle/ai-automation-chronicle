@@ -48,7 +48,7 @@
       </div>
       <div class="stat-divider"></div>
       <div class="stat-item">
-        <span class="stat-number">6</span>
+        <span class="stat-number">7</span>
         <span class="stat-label">Articles Published</span>
       </div>
       <div class="stat-divider"></div>
@@ -156,6 +156,79 @@
             <span class="tag orange">Security</span>
             <span class="tag">Privacy</span>
             <span class="read-time">16 min read</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- PAPER CARD — Week 13 / Article 07 -->
+      <a href="posts/week-13.html" class="paper-card" data-tab="practice">
+        <div class="paper-card-placeholder" style="background:none;padding:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 170" width="100%" height="170" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="w13bg" x1="0" y1="0" x2="400" y2="170" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#030B10"/>
+                <stop offset="100%" stop-color="#060A1A"/>
+              </linearGradient>
+              <linearGradient id="w13compress" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#1d4ed8"/>
+                <stop offset="50%" stop-color="#7c3aed"/>
+                <stop offset="100%" stop-color="#E04D14"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="170" fill="url(#w13bg)"/>
+            <!-- KV Cache compression visual: wide block -> narrow block -->
+            <rect x="14" y="20" width="55" height="110" rx="5" fill="#0c1a3a" stroke="#1d4ed8" stroke-width="1.5"/>
+            <text x="41" y="62" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#93c5fd" font-weight="700">KV</text>
+            <text x="41" y="74" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#93c5fd" font-weight="700">Cache</text>
+            <text x="41" y="86" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="6" fill="#4b5563">full</text>
+            <text x="41" y="95" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="6" fill="#4b5563">precision</text>
+            <!-- Arrow compress -->
+            <polygon points="75,75 95,60 95,90" fill="#1d4ed8" opacity="0.7"/>
+            <!-- Three algorithm boxes -->
+            <rect x="100" y="20" width="58" height="30" rx="4" fill="#1a0a3a" stroke="#7c3aed" stroke-width="1"/>
+            <text x="129" y="33" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#c4b5fd" font-weight="700">PolarQuant</text>
+            <text x="129" y="44" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="5.5" fill="#6b7280">polar coords</text>
+            <rect x="100" y="58" width="58" height="30" rx="4" fill="#1c0f00" stroke="#E04D14" stroke-width="1"/>
+            <text x="129" y="71" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7.5" fill="#fb923c" font-weight="700">QJL</text>
+            <text x="129" y="82" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="5.5" fill="#6b7280">1-bit correction</text>
+            <rect x="100" y="96" width="58" height="30" rx="4" fill="#0c1a3a" stroke="#38bdf8" stroke-width="1"/>
+            <text x="129" y="109" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="6.5" fill="#38bdf8" font-weight="700">TurboQuant</text>
+            <text x="129" y="120" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="5.5" fill="#6b7280">rotation stage</text>
+            <!-- Arrow to output -->
+            <polygon points="163,75 182,60 182,90" fill="#22c55e" opacity="0.8"/>
+            <!-- Compressed block -->
+            <rect x="187" y="42" width="22" height="76" rx="5" fill="#052e16" stroke="#22c55e" stroke-width="1.5"/>
+            <text x="198" y="75" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="6" fill="#86efac" font-weight="700" transform="rotate(-90,198,75)">3-bit</text>
+            <!-- Stats boxes -->
+            <rect x="222" y="20" width="74" height="34" rx="5" fill="#0f1117" stroke="#1e2230" stroke-width="1"/>
+            <text x="259" y="35" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="18" fill="#38bdf8" font-weight="800">6x</text>
+            <text x="259" y="48" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="6" fill="#6b7280">Memory Saved</text>
+            <rect x="305" y="20" width="74" height="34" rx="5" fill="#0f1117" stroke="#1e2230" stroke-width="1"/>
+            <text x="342" y="35" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="18" fill="#fb923c" font-weight="800">8x</text>
+            <text x="342" y="48" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="6" fill="#6b7280">H100 Speedup</text>
+            <rect x="222" y="62" width="74" height="34" rx="5" fill="#0f1117" stroke="#1e2230" stroke-width="1"/>
+            <text x="259" y="76" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="12" fill="#c4b5fd" font-weight="800">3-bit</text>
+            <text x="259" y="89" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="6" fill="#6b7280">Zero Accuracy Loss</text>
+            <rect x="305" y="62" width="74" height="34" rx="5" fill="#0f1117" stroke="#1e2230" stroke-width="1"/>
+            <text x="342" y="76" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" fill="#86efac" font-weight="800">No Train</text>
+            <text x="342" y="89" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="6" fill="#6b7280">Plug-in ready</text>
+            <!-- Google label -->
+            <rect x="222" y="104" width="157" height="22" rx="4" fill="#071e3d" stroke="#1d4ed8" stroke-width="1"/>
+            <text x="300" y="118" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7.5" fill="#93c5fd" font-weight="700">Google Research - ICLR 2026</text>
+            <!-- Bottom label strip -->
+            <rect x="0" y="153" width="400" height="17" fill="#030810" opacity="0.95"/>
+            <text x="200" y="164" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7.5" fill="#5AAAD0" letter-spacing="2">TURBOQUANT - KV CACHE COMPRESSION - EXTREME EFFICIENCY</text>
+          </svg>
+        </div>
+        <div class="paper-card-body">
+          <div class="paper-week">Article 07 &middot; April 2026</div>
+          <h3>TurboQuant: 6x Memory, 8x Speed, Zero Accuracy Loss - Google Redefined KV Cache Compression</h3>
+          <p>Google Research's TurboQuant compresses the KV cache of large language models to 3-bit precision with no training and no accuracy loss. Three coordinated algorithms deliver 6x memory reduction and 8x attention speedup on H100 GPUs - changing the economics of long-context inference.</p>
+          <div class="paper-meta">
+            <span class="tag orange">Quantization</span>
+            <span class="tag green">Efficiency</span>
+            <span class="tag purple">LLMs</span>
+            <span class="read-time">8 min read</span>
           </div>
         </div>
       </a>
