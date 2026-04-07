@@ -141,60 +141,6 @@
       font-weight: 500;
     }
   </style>
-  <style>
-    /* TTS Player */
-    .tts-player {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 2rem 2rem 0;
-    }
-    .tts-player-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      background: #f5f5f5;
-      border: 1px solid #dcdcdc;
-      border-left: 3px solid #0062A3;
-      border-radius: 8px;
-      padding: 0.85rem 1.2rem;
-      flex-wrap: wrap;
-    }
-    .tts-left {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-    }
-    .tts-icon { font-size: 1.05rem; line-height: 1; }
-    .tts-label { font-size: 0.875rem; font-weight: 600; color: #1a1a1a; }
-    .tts-duration {
-      font-size: 0.78rem;
-      color: #666;
-      background: #dcdcdc;
-      border-radius: 20px;
-      padding: 0.15rem 0.55rem;
-    }
-    .tts-controls { display: flex; gap: 0.5rem; align-items: center; }
-    .tts-btn {
-      font-family: 'Inter', Arial, sans-serif;
-      font-size: 0.8rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 4px;
-      padding: 0.45rem 1rem;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-    .tts-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .tts-btn.tts-play { background: #0062A3; color: #fff; }
-    .tts-btn.tts-play:hover:not(:disabled) { background: #004D8A; }
-    .tts-btn.tts-stop { background: transparent; color: #666; border: 1px solid #bdbdbd; }
-    .tts-btn.tts-stop:hover:not(:disabled) { background: #f5f5f5; color: #1a1a1a; }
-    @media (max-width: 600px) {
-      .tts-player { padding: 1.5rem 1.5rem 0; }
-      .tts-player-inner { flex-direction: column; align-items: flex-start; }
-    }
-  </style>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-SWMR2ZGHJE"></script>
   <script>
@@ -241,21 +187,6 @@
         <span class="tag green">Efficiency</span>
         <span class="tag purple">LLMs</span>
         <span class="tag">Deep Learning</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- TTS PLAYER -->
-  <div class="tts-player">
-    <div class="tts-player-inner">
-      <div class="tts-left">
-        <span class="tts-icon">&#128266;</span>
-        <span class="tts-label">Listen to this article</span>
-        <span class="tts-duration">8 min read</span>
-      </div>
-      <div class="tts-controls">
-        <button class="tts-btn tts-play" id="tts-play">&#9654; Play</button>
-        <button class="tts-btn tts-stop" id="tts-stop" disabled>&#9632; Stop</button>
       </div>
     </div>
   </div>
@@ -704,102 +635,6 @@
     });
   </script>
 
-  <!-- TTS SCRIPT -->
-  <script>
-    (function () {
-      const playBtn = document.getElementById('tts-play');
-      const stopBtn = document.getElementById('tts-stop');
-      let paused = false;
-
-      function pickVoice() {
-        const voices = speechSynthesis.getVoices();
-        const preferred = [
-          'Google UK English Male',
-          'Daniel',
-          'Alex',
-          'Microsoft David Desktop',
-          'Microsoft Mark Desktop',
-          'Google US English'
-        ];
-        for (const name of preferred) {
-          const v = voices.find(function(v) { return v.name === name; });
-          if (v) return v;
-        }
-        return voices.find(function(v) { return v.lang === 'en-US'; }) ||
-               voices.find(function(v) { return v.lang.startsWith('en'); }) ||
-               voices[0] || null;
-      }
-
-      function getArticleText() {
-        const body = document.querySelector('.post-body');
-        if (!body) return '';
-        const clone = body.cloneNode(true);
-        clone.querySelectorAll('pre, code, .diagram-wrap, .diagram-title, figcaption, .tag').forEach(function(el) {
-          el.remove();
-        });
-        return clone.innerText || clone.textContent || '';
-      }
-
-      function resetUI() {
-        playBtn.textContent = '\u25B6 Play';
-        playBtn.disabled = false;
-        stopBtn.disabled = true;
-        paused = false;
-      }
-
-      function doSpeak() {
-        const text = getArticleText();
-        if (!text.trim()) return;
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.95;
-        utterance.pitch = 1;
-        const voice = pickVoice();
-        if (voice) utterance.voice = voice;
-        utterance.onend = resetUI;
-        utterance.onerror = resetUI;
-        speechSynthesis.speak(utterance);
-        playBtn.textContent = '\u23F8 Pause';
-        stopBtn.disabled = false;
-        paused = false;
-      }
-
-      function startSpeech() {
-        speechSynthesis.cancel();
-        var voices = speechSynthesis.getVoices();
-        if (voices.length > 0) {
-          setTimeout(doSpeak, 100);
-        } else {
-          speechSynthesis.onvoiceschanged = function() {
-            speechSynthesis.onvoiceschanged = null;
-            setTimeout(doSpeak, 100);
-          };
-        }
-      }
-
-      playBtn.addEventListener('click', function () {
-        if (speechSynthesis.speaking && !paused) {
-          speechSynthesis.pause();
-          paused = true;
-          playBtn.textContent = '\u25B6 Resume';
-        } else if (paused) {
-          speechSynthesis.resume();
-          paused = false;
-          playBtn.textContent = '\u23F8 Pause';
-        } else {
-          startSpeech();
-        }
-      });
-
-      stopBtn.addEventListener('click', function () {
-        speechSynthesis.cancel();
-        resetUI();
-      });
-
-      if (typeof speechSynthesis.onvoiceschanged !== 'undefined') {
-        speechSynthesis.onvoiceschanged = function () {};
-      }
-    })();
-  </script>
 
 </body>
 </html>
