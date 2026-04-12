@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="A deep dive into 'Generative Modeling via Drifting' - MIT and Harvard researchers introduce Drifting Models that achieve state-of-the-art one-step image generation with FID 1.54 on ImageNet 256x256."/>
+  <meta property="og:title" content="Generative Modeling via Drifting · AI & Automation Chronicle"/>
+  <meta property="og:description" content="Drifting Models evolve the generator distribution during training instead of inference, enabling one-step image generation that beats diffusion models requiring 500 steps."/>
+  <meta property="og:type" content="article"/>
+  <title>Week 07 · Generative Modeling via Drifting · AI & Automation Chronicle</title>
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SWMR2ZGHJE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-SWMR2ZGHJE');
+  </script>
+</head>
+<body>
+
+  <!-- READING PROGRESS BAR -->
+  <div id="progress-bar"></div>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="../index.html" class="nav-brand">AI & <span>Automation</span> Chronicle</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <div class="breadcrumb-inner">
+      <a href="../index.html">Home</a>
+      <span class="breadcrumb-sep">&#8250;</span>
+      <span class="breadcrumb-current">Week 07 &middot; Generative Modeling via Drifting</span>
+    </div>
+  </div>
+
+  <!-- POST HEADER -->
+  <div class="post-header">
+    <div class="post-header-inner">
+      <span class="post-week">Week 07 &middot; April 2026</span>
+      <h1>Generative Modeling via Drifting - One Step Is All You Need</h1>
+      <div class="post-header-meta">
+        <span>April 12, 2026 &middot; by Satish K C</span>
+        <span>7 min read</span>
+      </div>
+      <div class="post-header-tags">
+        <span class="tag">Deep Learning</span>
+        <span class="tag green">Generative Models</span>
+        <span class="tag purple">Computer Vision</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- POST BODY -->
+  <div class="post-body">
+
+    <h2>The Paper</h2>
+    <p>
+      <strong>"Generative Modeling via Drifting"</strong> was published in February 2026 by Mingyang Deng,
+      He Li, Tianhong Li, Yilun Du, and Kaiming He - researchers at MIT and Harvard University. The central
+      claim is that generative modeling does not need iterative inference at all. The authors introduce
+      <strong>Drifting Models</strong>, a new paradigm where the generator's output distribution evolves
+      during training through a learned drifting field, and at inference time, a single forward pass produces
+      the final sample. On ImageNet 256x256, the model achieves an FID of 1.54 in latent space and 1.61 in
+      pixel space - both state-of-the-art for one-step generators.
+    </p>
+    <a href="https://arxiv.org/abs/2602.04770" target="_blank" rel="noopener" class="paper-link">
+      Read the Paper on arXiv &#8594;
+    </a>
+
+    <h2>The Problem Before This Paper</h2>
+    <p>
+      Diffusion and flow-based models produce high-quality images but require hundreds of iterative
+      denoising steps at inference time. DiT-XL/2 needs 500 function evaluations (NFE) to reach an FID
+      of 2.27 on ImageNet 256x256. SiT-XL/2 with REPA needs the same 500 steps for 1.42 FID. Consistency
+      models and distillation methods attempt to reduce step count but typically sacrifice quality -
+      and many still require a pre-trained multi-step teacher model. GANs offer single-step generation
+      but have historically struggled with training instability and mode collapse, with StyleGAN-XL reaching
+      only 2.30 FID and BigGAN reaching 6.95 FID on the same benchmark. No existing paradigm cleanly
+      delivered both one-step inference and state-of-the-art quality without auxiliary teacher models.
+    </p>
+
+    <h2>What They Built</h2>
+    <p>
+      Drifting Models define a <strong>drifting field</strong> V that governs how generated samples should
+      move to better match the data distribution. The field is composed of two opposing forces: an attraction
+      term that pulls generated samples toward nearby data points, and a repulsion term that pushes them
+      away from other generated samples. The equilibrium condition - when the generated distribution matches
+      the data distribution - is guaranteed by the field's anti-symmetric property: V_{p,q} = -V_{q,p},
+      meaning the field vanishes exactly when p equals q. During training, the network f_theta maps noise
+      to samples, and the optimizer updates weights by regressing toward "drifted targets" - the current
+      output shifted by the estimated field V.
+    </p>
+
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #E04D14;">
+      V_{p,q}(x) = V+_p(x) - V-_q(x)
+      <br/>
+      Loss = ||f_theta(epsilon) - stopgrad(f_theta(epsilon) + V(f_theta(epsilon)))||^2
+    </p>
+
+    <p>
+      The attraction and repulsion forces use a kernel function k(x,y) = exp(-||x-y||/tau) with softmax
+      normalization over mini-batch samples. The architecture is a DiT-style transformer with patch size 2
+      operating in the latent space of a pre-trained SD-VAE encoder (32x32x4 latent resolution). A key
+      design choice is the feature encoder - a ResNet-style MAE pre-trained on the latent space - that
+      extracts multi-scale features for computing the drifting field. The entire system trains end-to-end
+      without any teacher model, distillation, or adversarial loss.
+    </p>
+
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #0062A3;">
+      k(x, y) = exp(-||x - y|| / tau)
+      <br/>
+      Equilibrium: V_{p,q} = 0 when p = q (anti-symmetric property)
+    </p>
+
+    <h2>Key Findings</h2>
+    <ul>
+      <li><strong>State-of-the-art one-step generation.</strong> Drifting Model L/2 achieves FID 1.54 (latent) and 1.61 (pixel) on ImageNet 256x256 with a single forward pass - beating all prior one-step methods including iMeanFlow (1.72 FID) and AdvFlow (2.38 FID).</li>
+      <li><strong>Competitive with 500-step diffusion models.</strong> The one-step FID of 1.54 is within striking distance of SiT-XL/2+REPA (1.42 FID at 500 NFE) and LightningDiT (1.35 FID at 500 NFE), while requiring 500x fewer function evaluations.</li>
+      <li><strong>Anti-symmetry is critical.</strong> Ablation studies show that breaking the balance between attraction and repulsion causes FID to collapse: 1.5x attraction bias degrades FID from 8.46 to 41.05, attraction-only reaches 177.14 FID.</li>
+      <li><strong>Scales beyond images to robotics.</strong> A one-step Drifting Policy matched or exceeded 100-step Diffusion Policy performance across single-stage and multi-stage robot manipulation tasks.</li>
+    </ul>
+
+    <h2>Results</h2>
+    <p>
+      On ImageNet 256x256, Drifting Model L/2 in latent space achieves FID 1.54 with Inception Score 258.9
+      using a single forward pass. In pixel space, the L/16 variant reaches FID 1.61 with IS 307.5 - matching
+      PixelDiT/16 (1.61 FID at 400 steps) exactly, but in one step. For comparison, StyleGAN-XL achieves
+      2.30 FID and BigGAN reaches 6.95 FID, both also single-step. Among multi-step methods, DiT-XL/2
+      achieves 2.27 FID at 500 NFE, while SiT-XL/2 with REPA pushes to 1.42 FID at the same step count.
+      Training scales predictably: the B/2 model improves from 3.36 FID at 100 epochs to 1.75 FID at
+      1280 epochs, and upgrading to L/2 at 1280 epochs reaches the final 1.54.
+    </p>
+
+    <h2>Why This Matters for AI and Automation</h2>
+    <ul>
+      <li><strong>Latency reduction.</strong> One-step inference means real-time image generation becomes trivially achievable. Applications that currently batch diffusion steps - product image generation, design automation, synthetic data pipelines - can run 100-500x faster at the same quality level.</li>
+      <li><strong>No teacher dependency.</strong> Unlike distillation approaches (consistency distillation, progressive distillation), Drifting Models train from scratch. This eliminates the need to first train an expensive multi-step teacher, simplifying the training pipeline and reducing total compute.</li>
+      <li><strong>Robotics implications.</strong> The demonstrated transfer to robot manipulation policies suggests the paradigm generalizes beyond image synthesis. Any domain currently using diffusion-based planners or policy generators - warehouse automation, robotic assembly, autonomous navigation - could benefit from the same one-step speedup.</li>
+      <li><strong>Kaiming He's involvement.</strong> This is a signal paper. He's track record (ResNet, MAE, Mask R-CNN) means this paradigm will receive significant follow-up attention from the research community.</li>
+    </ul>
+
+    <h2>My Take</h2>
+    <p>
+      The elegance of this work is in the formulation. Rather than trying to compress a multi-step process
+      into fewer steps (distillation) or stabilize adversarial training (GANs), Drifting Models reframe
+      the problem entirely: let the optimizer itself be the iterative process, and let inference be a
+      single deterministic mapping. The anti-symmetry property providing a natural equilibrium condition
+      is a clean theoretical contribution - the ablation results showing how quickly quality degrades
+      without it (8.46 to 177.14 FID) confirm this is not a cosmetic design choice but a structural
+      requirement. The fact that the same framework transfers directly to robotics policy generation
+      strengthens the claim that this is a genuine paradigm shift, not an image-specific trick.
+    </p>
+    <p>
+      The open question is scaling behavior. The current results use ImageNet 256x256 - a well-studied
+      benchmark but far from the resolution and diversity demands of production text-to-image systems.
+      Whether the drifting field formulation remains stable and effective at 1024x1024 resolution with
+      text conditioning, and whether it can match the diversity and controllability of classifier-free
+      guided diffusion at scale, will determine whether this paradigm moves from research milestone to
+      production deployment. The kernel-based field computation also raises questions about mini-batch
+      sensitivity and compute cost at very large batch sizes.
+    </p>
+
+    <p>
+      <strong>Discussion question:</strong> If one-step generators now match the quality of 500-step
+      diffusion models on standard benchmarks, what remaining advantages - if any - do iterative methods
+      retain that could keep them relevant in production systems?
+    </p>
+
+  </div>
+
+  <!-- SHARE SECTION -->
+  <div class="share-section">
+    <h3>Share this discussion</h3>
+    <div class="share-buttons">
+      <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fai-automation-chronicle.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-14.html&title=Generative%20Modeling%20via%20Drifting%20-%20One%20Step%20Is%20All%20You%20Need"
+         target="_blank" rel="noopener" class="share-btn linkedin">
+        LinkedIn
+      </a>
+      <a href="https://twitter.com/intent/tweet?text=Drifting%20Models%20achieve%20FID%201.54%20on%20ImageNet%20256x256%20in%20a%20single%20step%20-%20matching%20500-step%20diffusion%20models&url=https%3A%2F%2Fai-automation-chronicle.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-14.html"
+         target="_blank" rel="noopener" class="share-btn twitter">
+        X / Twitter
+      </a>
+      <button class="share-btn copy" id="copy-btn" onclick="
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          this.textContent = 'Copied!';
+          setTimeout(() => { this.textContent = 'Copy Link'; }, 2000);
+        });
+      ">
+        Copy Link
+      </button>
+    </div>
+  </div>
+
+  <!-- POST NAVIGATION -->
+  <div class="post-nav">
+    <a href="../index.html">&#8592; Back to all papers</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <a href="../about.html">About</a>
+      <a href="https://github.com/satishkc7" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://linkedin.com/in/satishkc7" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <p>&copy; 2026 AI &amp; Automation Chronicle &middot; Built by <a href="https://github.com/satishkc7" target="_blank" rel="noopener">Satish K C</a></p>
+  </footer>
+
+  <!-- READING PROGRESS SCRIPT -->
+  <script>
+    const bar = document.getElementById('progress-bar');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = docHeight > 0 ? (scrollTop / docHeight * 100) + '%' : '0%';
+    });
+  </script>
+
+</body>
+</html>
