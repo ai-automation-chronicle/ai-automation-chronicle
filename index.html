@@ -43,7 +43,7 @@
   <div class="stats-bar">
     <div class="stats-bar-inner">
       <div class="stat-item">
-        <span class="stat-number">7</span>
+        <span class="stat-number">8</span>
         <span class="stat-label">Research Papers</span>
       </div>
       <div class="stat-divider"></div>
@@ -84,6 +84,65 @@
       <div class="month-separator" data-month-sep="true">
         <span>April 2026</span>
       </div>
+
+      <!-- PAPER CARD — Week 15 / Week 08 Research -->
+      <a href="posts/week-15.html" class="paper-card" data-tab="research">
+        <div class="paper-card-placeholder" style="background:none;padding:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 170" width="100%" height="170" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="w15bg" x1="0" y1="0" x2="400" y2="170" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#04101E"/>
+                <stop offset="100%" stop-color="#0A0A18"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="170" fill="url(#w15bg)"/>
+            <!-- Grid lines -->
+            <g stroke="#121828" stroke-width="0.6">
+              <line x1="0" y1="56" x2="400" y2="56"/>
+              <line x1="0" y1="112" x2="400" y2="112"/>
+              <line x1="133" y1="0" x2="133" y2="170"/>
+              <line x1="266" y1="0" x2="266" y2="170"/>
+            </g>
+            <!-- GRPO side: collapsed bars (all same height = bad) -->
+            <text x="72" y="28" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#6b7280" letter-spacing="1">GRPO</text>
+            <rect x="22" y="60" width="14" height="52" rx="2" fill="#3A8EC8" opacity="0.5"/>
+            <rect x="42" y="60" width="14" height="52" rx="2" fill="#E04D14" opacity="0.5"/>
+            <rect x="62" y="60" width="14" height="52" rx="2" fill="#3A8EC8" opacity="0.5"/>
+            <rect x="82" y="60" width="14" height="52" rx="2" fill="#E04D14" opacity="0.5"/>
+            <rect x="102" y="60" width="14" height="52" rx="2" fill="#3A8EC8" opacity="0.5"/>
+            <text x="72" y="125" text-anchor="middle" font-family="monospace" font-size="6" fill="#E04D14">collapsed</text>
+            <!-- Arrow in center -->
+            <text x="200" y="82" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="18" fill="#E04D14" opacity="0.7">&#8594;</text>
+            <!-- GDPO side: distinct bars (varied heights = good) -->
+            <text x="328" y="28" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#6b7280" letter-spacing="1">GDPO</text>
+            <rect x="278" y="88" width="14" height="24" rx="2" fill="#3A8EC8" opacity="0.8"/>
+            <rect x="298" y="72" width="14" height="40" rx="2" fill="#E04D14" opacity="0.8"/>
+            <rect x="318" y="50" width="14" height="62" rx="2" fill="#3A8EC8" opacity="0.8"/>
+            <rect x="338" y="79" width="14" height="33" rx="2" fill="#E04D14" opacity="0.8"/>
+            <rect x="358" y="62" width="14" height="50" rx="2" fill="#3A8EC8" opacity="0.8"/>
+            <text x="328" y="125" text-anchor="middle" font-family="monospace" font-size="6" fill="#3A8EC8">distinct</text>
+            <!-- Label badges -->
+            <rect x="12" y="33" width="120" height="16" rx="3" fill="#0a0f1c" stroke="#1D5080" stroke-width="0.8"/>
+            <text x="72" y="44" text-anchor="middle" font-family="monospace" font-size="6.5" fill="#5AAAD0">r1+r2 normalized together</text>
+            <rect x="268" y="33" width="120" height="16" rx="3" fill="#0a0f1c" stroke="#E04D14" stroke-width="0.8"/>
+            <text x="328" y="44" text-anchor="middle" font-family="monospace" font-size="6.5" fill="#E04D14">per-reward normalization</text>
+            <!-- Bottom label strip -->
+            <rect x="0" y="153" width="400" height="17" fill="#030810" opacity="0.95"/>
+            <text x="200" y="164" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7.5" fill="#5AAAD0" letter-spacing="2.5">GDPO - MULTI-REWARD RLHF - NVIDIA 2026</text>
+          </svg>
+        </div>
+        <div class="paper-card-body">
+          <div class="paper-week">Week 08 &middot; April 2026</div>
+          <h3>GDPO: Why GRPO Breaks Under Multiple Rewards - and How to Fix It</h3>
+          <p>NVIDIA researchers show that GRPO's reward normalization collapses distinct advantage signals when multiple rewards are used together, causing training instability. GDPO decouples normalization per reward, boosting AIME accuracy from 23.1% to 29.4% and eliminating training collapse.</p>
+          <div class="paper-meta">
+            <span class="tag">Deep Learning</span>
+            <span class="tag purple">LLMs</span>
+            <span class="tag orange">RLHF</span>
+            <span class="read-time">7 min read</span>
+          </div>
+        </div>
+      </a>
 
       <!-- PAPER CARD — Week 14 / Week 07 Research -->
       <a href="posts/week-14.html" class="paper-card" data-tab="research">

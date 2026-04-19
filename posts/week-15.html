@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="A deep dive into GDPO - NVIDIA researchers show that GRPO's reward normalization collapses distinct advantage signals in multi-reward RLHF, and introduce a decoupled fix that consistently outperforms GRPO on tool calling, math, and coding tasks."/>
+  <meta property="og:title" content="GDPO: Fixing Multi-Reward RLHF · AI & Automation Chronicle"/>
+  <meta property="og:description" content="GRPO normalizes aggregated rewards, collapsing distinct advantage signals into identical values. GDPO decouples normalization per reward and eliminates training collapse while outperforming GRPO across tool calling, math reasoning, and coding."/>
+  <meta property="og:type" content="article"/>
+  <title>Week 08 · GDPO: Fixing Multi-Reward RLHF · AI & Automation Chronicle</title>
+  <link rel="stylesheet" href="../assets/css/style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SWMR2ZGHJE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-SWMR2ZGHJE');
+  </script>
+</head>
+<body>
+
+  <!-- READING PROGRESS BAR -->
+  <div id="progress-bar"></div>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="../index.html" class="nav-brand">AI & <span>Automation</span> Chronicle</a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About</a></li>
+    </ul>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <div class="breadcrumb-inner">
+      <a href="../index.html">Home</a>
+      <span class="breadcrumb-sep">&#8250;</span>
+      <span class="breadcrumb-current">Week 08 &middot; GDPO: Fixing Multi-Reward RLHF</span>
+    </div>
+  </div>
+
+  <!-- POST HEADER -->
+  <div class="post-header">
+    <div class="post-header-inner">
+      <span class="post-week">Week 08 &middot; April 2026</span>
+      <h1>GDPO: Why GRPO Breaks Under Multiple Rewards - and How to Fix It</h1>
+      <div class="post-header-meta">
+        <span>April 18, 2026 &middot; by Satish K C</span>
+        <span>7 min read</span>
+      </div>
+      <div class="post-header-tags">
+        <span class="tag">Deep Learning</span>
+        <span class="tag purple">LLMs</span>
+        <span class="tag orange">RLHF</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- POST BODY -->
+  <div class="post-body">
+
+    <h2>The Paper</h2>
+    <p>
+      <strong>"GDPO: Group reward-Decoupled Normalization Policy Optimization"</strong> was released in
+      January 2026 by Shih-Yang Liu, Xin Dong, Ximing Lu, Shizhe Diao, Peter Belcak, Mingjie Liu,
+      Min-Hung Chen, Hongxu Yin, Yu-Chiang Frank Wang, Kwang-Ting Cheng, Yejin Choi, Jan Kautz, and
+      Pavlo Molchanov - a team of researchers at NVIDIA. The paper's central claim is that applying
+      Group Relative Policy Optimization (GRPO) directly to multi-reward settings is fundamentally
+      flawed: normalizing a combined reward signal causes distinct rollout advantages to collapse into
+      identical values, eroding the training signal and causing instability. The authors introduce
+      <strong>GDPO</strong>, which decouples normalization to operate per reward before aggregation,
+      preserving advantage resolution and enabling stable, consistent improvement across tool calling,
+      math reasoning, and coding tasks.
+    </p>
+    <a href="https://arxiv.org/abs/2601.05242" target="_blank" rel="noopener" class="paper-link">
+      Read the Paper on arXiv &#8594;
+    </a>
+
+    <h2>The Problem Before This Paper</h2>
+    <p>
+      GRPO, introduced as part of DeepSeek-R1's training pipeline, computes advantages by normalizing
+      rewards across a group of rollouts from the same prompt. It was designed for single-reward settings,
+      where the only signal is, say, answer correctness. Modern RLHF pipelines increasingly combine
+      multiple rewards - correctness, format adherence, output length constraints - to shape more nuanced
+      behavior. The straightforward approach is to aggregate these rewards into a weighted sum and apply
+      GRPO as-is. The NVIDIA team shows this is not a safe default: when rewards of varying scale and
+      difficulty are summed before normalization, rollouts that differ meaningfully on individual reward
+      components end up with nearly identical normalized advantages. The gradient signal becomes nearly
+      uniform across the group, reducing effective batch diversity and, in the case of math reasoning
+      with a format reward, causing training collapse around step 400.
+    </p>
+
+    <h2>What They Built</h2>
+    <p>
+      GDPO's core change is to move normalization inside the reward loop rather than applying it after
+      aggregation. For each reward r_i in the multi-reward set, a group-wise mean and standard deviation
+      are computed independently across the rollout group, producing a per-reward normalized advantage
+      A_i. These per-reward advantages are then summed and passed through a final batch-level normalization
+      to produce the final advantage A used in the policy gradient update. This two-level normalization -
+      per-reward group normalization followed by batch normalization - ensures that each reward retains
+      its relative ordering across rollouts regardless of the absolute scale differences between reward
+      types. The paper also introduces <strong>reward conditioning</strong> as a complementary technique:
+      when one reward is significantly harder to satisfy than another (e.g., format correctness vs.
+      answer correctness in math), the easier reward's gradient is gated on whether the harder reward
+      was already satisfied, preventing the model from gaming the easier signal at the cost of the harder one.
+    </p>
+
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #E04D14;">
+      // GRPO (broken in multi-reward):<br/>
+      A = normalize( sum_i( w_i * r_i ) )<br/>
+      <br/>
+      // GDPO (decoupled):<br/>
+      A_i = group_normalize( r_i )  &nbsp;&nbsp;// per-reward, independent<br/>
+      A = batch_normalize( sum_i( w_i * A_i ) )
+    </p>
+
+    <p style="font-family: 'Courier New', monospace; background: #f5f5f5; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.9rem; color: #1a1a1a; border-left: 3px solid #0062A3;">
+      // Reward conditioning (difficulty-aware gating):<br/>
+      A_easy = A_easy * I[ r_hard &gt; threshold ]<br/>
+      // Easy reward gradient fires only when hard reward is satisfied
+    </p>
+
+    <h2>Key Findings</h2>
+    <ul>
+      <li><strong>Advantage collapse is a structural problem, not a tuning issue.</strong> As rollout count or reward count increases, the number of distinct advantage groups under GRPO drops sharply. GDPO maintains high group diversity across all configurations tested.</li>
+      <li><strong>GRPO collapses on math reasoning; GDPO does not.</strong> On DeepSeek-R1-1.5B with correctness and length rewards, GRPO training diverges around step 400. GDPO runs to completion with stable loss curves.</li>
+      <li><strong>Removing std normalization from GRPO ("GRPO w/o std") is insufficient.</strong> This variant marginally improves advantage diversity but still produces 0% format correctness on BFCL-v3 tool calling - the same failure mode as standard GRPO.</li>
+      <li><strong>Reward conditioning outperforms weight adjustment.</strong> Manually down-weighting easier rewards reduces their contribution but does not prevent the model from satisfying them at the wrong time. Conditioning gates the gradient more precisely.</li>
+      <li><strong>Gains are consistent across model sizes and task types.</strong> GDPO improves over GRPO at both 1.5B and 3B parameter scales and across all three task domains tested, with no settings where GRPO is competitive.</li>
+    </ul>
+
+    <h2>Results</h2>
+    <p>
+      On tool calling with Qwen2.5-Instruct models evaluated on BFCL-v3, GDPO raises average accuracy
+      from 30.18% to 32.81% at 1.5B parameters, and from 39.20% to 40.87% at 3B - while also improving
+      format correctness from 76.33% to 80.66% (1.5B) and 81.64% to 82.23% (3B). On math reasoning
+      with DeepSeek-R1-1.5B, GDPO achieves 29.4% on AIME-24 versus GRPO's 23.1%, and 86.2% on MATH500
+      versus 83.6%, while also reducing the length-exceed rate from 10.8% to 6.5% - a direct indicator
+      of improved length reward adherence. On coding with DeepSeek-R1-7B evaluated on Codeforces, pass
+      rate improves from 68.1% to 71.2% and bug ratio drops from 7.0% to 5.6%. Across all tasks, no
+      single setting shows a regression under GDPO relative to GRPO.
+    </p>
+
+    <h2>Why This Matters for AI and Automation</h2>
+    <ul>
+      <li><strong>Multi-reward RLHF is the production default.</strong> Single-reward training is a research simplification. Any real alignment pipeline - whether for assistants, agents, or domain-specific models - combines at least correctness, safety, and format signals. This paper exposes a silent failure mode that practitioners likely already hit without knowing the cause.</li>
+      <li><strong>Drop-in fix with no architectural change.</strong> GDPO is a normalization schedule change, not a new algorithm. It requires no changes to model architecture, reward model design, or rollout strategy. The integration cost is low relative to the reliability gain.</li>
+      <li><strong>Training stability directly reduces compute waste.</strong> The GRPO collapse on math at step 400 means hours of GPU time and reward model queries are lost to a failed run. GDPO eliminates this category of failure, making RL fine-tuning runs more predictable and resource-efficient at scale.</li>
+      <li><strong>Reward conditioning is broadly applicable.</strong> The insight that reward difficulty disparities require gating, not just reweighting, generalizes to any pipeline where one signal is harder to satisfy than another - a common scenario in enterprise LLM fine-tuning for structured output or compliance requirements.</li>
+    </ul>
+
+    <h2>My Take</h2>
+    <p>
+      This is an important paper precisely because it is narrow and empirically honest. The contribution
+      is not a new architecture or a new training paradigm - it is a documented failure mode in a widely
+      adopted method, with a principled fix and rigorous ablations. The collapse behavior GRPO exhibits
+      at step 400 in math training is the kind of issue that would appear in an internal experiment as
+      "unstable training run" and get attributed to hyperparameters or data quality. The team here does
+      the work to isolate the cause: advantage homogenization from pre-normalization aggregation. The
+      solution, decoupled group normalization, is elegant and the ablation showing GRPO w/o std still
+      fails on format rewards is particularly well-designed - it rules out the obvious partial fix before
+      proposing the full one. The open question is whether GDPO's advantage of preserving per-reward
+      resolution holds when reward count grows to five or more signals, as some enterprise alignment
+      pipelines require, or when rewards are correlated rather than independent. The paper tests up to
+      two rewards, and the interaction dynamics in higher-dimensional reward spaces remain unexplored.
+    </p>
+
+    <p>
+      <strong>Discussion question:</strong> If GRPO's normalization collapses advantages when rewards
+      are aggregated before normalization, what does this imply about reward model design choices -
+      specifically, should practitioners design reward models that output independent scalar signals
+      rather than composite scores, even when the behaviors being evaluated are inherently correlated?
+    </p>
+
+  </div>
+
+  <!-- SHARE SECTION -->
+  <div class="share-section">
+    <h3>Share this discussion</h3>
+    <div class="share-buttons">
+      <a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fai-automation-chronicle.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-15.html&title=GDPO%3A%20Why%20GRPO%20Breaks%20Under%20Multiple%20Rewards"
+         target="_blank" rel="noopener" class="share-btn linkedin">
+        LinkedIn
+      </a>
+      <a href="https://twitter.com/intent/tweet?text=NVIDIA%20shows%20GRPO%20collapses%20advantage%20signals%20in%20multi-reward%20RLHF%20-%20GDPO%20fixes%20it%20with%20decoupled%20normalization&url=https%3A%2F%2Fai-automation-chronicle.github.io%2Fai-automation-chronicle%2Fposts%2Fweek-15.html"
+         target="_blank" rel="noopener" class="share-btn twitter">
+        X / Twitter
+      </a>
+      <button class="share-btn copy" id="copy-btn" onclick="
+        navigator.clipboard.writeText(window.location.href).then(() => {
+          this.textContent = 'Copied!';
+          setTimeout(() => { this.textContent = 'Copy Link'; }, 2000);
+        });
+      ">
+        Copy Link
+      </button>
+    </div>
+  </div>
+
+  <!-- POST NAVIGATION -->
+  <div class="post-nav">
+    <a href="../index.html">&#8592; Back to all papers</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-links">
+      <a href="../index.html">Home</a>
+      <a href="../about.html">About</a>
+      <a href="https://github.com/satishkc7" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://linkedin.com/in/satishkc7" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+    <p>&copy; 2026 AI &amp; Automation Chronicle &middot; Built by <a href="https://github.com/satishkc7" target="_blank" rel="noopener">Satish K C</a></p>
+  </footer>
+
+  <!-- READING PROGRESS SCRIPT -->
+  <script>
+    const bar = document.getElementById('progress-bar');
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      bar.style.width = docHeight > 0 ? (scrollTop / docHeight * 100) + '%' : '0%';
+    });
+  </script>
+
+</body>
+</html>
