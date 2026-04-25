@@ -43,7 +43,7 @@
   <div class="stats-bar">
     <div class="stats-bar-inner">
       <div class="stat-item">
-        <span class="stat-number">8</span>
+        <span class="stat-number">9</span>
         <span class="stat-label">Research Papers</span>
       </div>
       <div class="stat-divider"></div>
@@ -84,6 +84,90 @@
       <div class="month-separator" data-month-sep="true">
         <span>April 2026</span>
       </div>
+
+      <!-- PAPER CARD — Week 16 / Week 09 Research -->
+      <a href="posts/week-16.html" class="paper-card" data-tab="research">
+        <div class="paper-card-placeholder" style="background:none;padding:0;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 170" width="100%" height="170" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="w16bg" x1="0" y1="0" x2="400" y2="170" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#04101E"/>
+                <stop offset="100%" stop-color="#0A0A18"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="170" fill="url(#w16bg)"/>
+            <!-- Grid lines -->
+            <g stroke="#121828" stroke-width="0.6">
+              <line x1="0" y1="56" x2="400" y2="56"/>
+              <line x1="0" y1="112" x2="400" y2="112"/>
+              <line x1="133" y1="0" x2="133" y2="170"/>
+              <line x1="266" y1="0" x2="266" y2="170"/>
+            </g>
+            <!-- Left: Flat memory (scattered dots, disconnected) -->
+            <text x="66" y="22" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#6b7280" letter-spacing="1">FLAT MEMORY</text>
+            <circle cx="30" cy="50" r="5" fill="#3A8EC8" opacity="0.4"/>
+            <circle cx="55" cy="65" r="5" fill="#3A8EC8" opacity="0.4"/>
+            <circle cx="42" cy="85" r="5" fill="#3A8EC8" opacity="0.4"/>
+            <circle cx="75" cy="48" r="5" fill="#3A8EC8" opacity="0.4"/>
+            <circle cx="90" cy="78" r="5" fill="#3A8EC8" opacity="0.4"/>
+            <circle cx="68" cy="95" r="5" fill="#3A8EC8" opacity="0.4"/>
+            <circle cx="35" cy="105" r="5" fill="#3A8EC8" opacity="0.4"/>
+            <text x="66" y="125" text-anchor="middle" font-family="monospace" font-size="6" fill="#3A6A90">disconnected facts</text>
+            <!-- Center: Arrow -->
+            <rect x="142" y="58" width="48" height="22" rx="4" fill="#0a0f1c" stroke="#E04D14" stroke-width="0.8"/>
+            <text x="166" y="73" text-anchor="middle" font-family="monospace" font-size="7" fill="#E04D14">StructMem</text>
+            <line x1="132" y1="70" x2="142" y2="70" stroke="#E04D14" stroke-width="1.5"/>
+            <line x1="190" y1="70" x2="200" y2="70" stroke="#E04D14" stroke-width="1.5"/>
+            <polygon points="200,66 210,70 200,74" fill="#E04D14"/>
+            <!-- Right: Hierarchical memory (connected nodes) -->
+            <text x="330" y="22" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#6b7280" letter-spacing="1">HIERARCHICAL</text>
+            <!-- Event-level clusters -->
+            <circle cx="290" cy="55" r="6" fill="#E04D14" opacity="0.7"/>
+            <circle cx="305" cy="48" r="4" fill="#3A8EC8" opacity="0.6"/>
+            <circle cx="303" cy="64" r="4" fill="#3A8EC8" opacity="0.6"/>
+            <line x1="290" y1="55" x2="305" y2="48" stroke="#5AAAD0" stroke-width="0.8" opacity="0.5"/>
+            <line x1="290" y1="55" x2="303" y2="64" stroke="#5AAAD0" stroke-width="0.8" opacity="0.5"/>
+            <!-- Second cluster -->
+            <circle cx="350" cy="70" r="6" fill="#E04D14" opacity="0.7"/>
+            <circle cx="365" cy="63" r="4" fill="#3A8EC8" opacity="0.6"/>
+            <circle cx="363" cy="79" r="4" fill="#3A8EC8" opacity="0.6"/>
+            <line x1="350" y1="70" x2="365" y2="63" stroke="#5AAAD0" stroke-width="0.8" opacity="0.5"/>
+            <line x1="350" y1="70" x2="363" y2="79" stroke="#5AAAD0" stroke-width="0.8" opacity="0.5"/>
+            <!-- Third cluster -->
+            <circle cx="320" cy="95" r="6" fill="#E04D14" opacity="0.7"/>
+            <circle cx="335" cy="88" r="4" fill="#3A8EC8" opacity="0.6"/>
+            <circle cx="333" cy="104" r="4" fill="#3A8EC8" opacity="0.6"/>
+            <line x1="320" y1="95" x2="335" y2="88" stroke="#5AAAD0" stroke-width="0.8" opacity="0.5"/>
+            <line x1="320" y1="95" x2="333" y2="104" stroke="#5AAAD0" stroke-width="0.8" opacity="0.5"/>
+            <!-- Cross-event connections (orange dashed) -->
+            <line x1="290" y1="55" x2="350" y2="70" stroke="#E04D14" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.6"/>
+            <line x1="350" y1="70" x2="320" y2="95" stroke="#E04D14" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.6"/>
+            <line x1="290" y1="55" x2="320" y2="95" stroke="#E04D14" stroke-width="1.2" stroke-dasharray="4,3" opacity="0.4"/>
+            <text x="330" y="125" text-anchor="middle" font-family="monospace" font-size="6" fill="#E04D14">event-level bindings</text>
+            <!-- Score badge -->
+            <rect x="266" y="32" width="56" height="14" rx="3" fill="#100500" stroke="#E04D14" stroke-width="0.6" opacity="0.7"/>
+            <text x="294" y="42" text-anchor="middle" font-family="monospace" font-size="6.5" fill="#E07040">76.82 overall</text>
+            <!-- Efficiency badge -->
+            <rect x="330" y="32" width="56" height="14" rx="3" fill="#0a0f1c" stroke="#1D5080" stroke-width="0.6" opacity="0.7"/>
+            <text x="358" y="42" text-anchor="middle" font-family="monospace" font-size="6.5" fill="#5AAAD0">18x fewer tok</text>
+            <!-- Bottom label strip -->
+            <rect x="0" y="153" width="400" height="17" fill="#030810" opacity="0.95"/>
+            <text x="200" y="164" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7.5" fill="#5AAAD0" letter-spacing="2.5">STRUCTMEM - HIERARCHICAL AGENT MEMORY - ZHEJIANG + ANT GROUP 2026</text>
+          </svg>
+        </div>
+        <div class="paper-card-body">
+          <div class="paper-week">Week 09 &middot; April 2026</div>
+          <h3>StructMem: Why Flat Memory Breaks on Long Conversations - and How Hierarchical Design Fixes It</h3>
+          <p>Flat memory plateaus at 60 entries. Graph memory costs 18x more tokens. StructMem from Zhejiang University and Ant Group finds the middle ground - hierarchical event binding with cross-event consolidation hits 76.82% on LoCoMo with only 1,056 API calls.</p>
+          <div class="paper-meta">
+            <span class="tag">Deep Learning</span>
+            <span class="tag purple">LLMs</span>
+            <span class="tag orange">Agents</span>
+            <span class="tag green">RAG</span>
+            <span class="read-time">8 min read</span>
+          </div>
+        </div>
+      </a>
 
       <!-- PAPER CARD — Week 15 / Week 08 Research -->
       <a href="posts/week-15.html" class="paper-card" data-tab="research">

@@ -12,6 +12,7 @@ Thumbs.db
 .env
 .env.local
 *.env
+*.md
 
 # Logs
 *.log
@@ -23,3 +24,6 @@ npm-debug.log
 # Drafts
 drafts/
 *.draft.html
+
+# LinkedIn Posts
+LinkedinPost/
