@@ -1330,12 +1330,11 @@
   </footer>
 
   <script>
+    /* ---- Tab switching ---- */
     function updateMonthSeparators(tab) {
-      // Hide all separators first, then show ones that have visible cards
       document.querySelectorAll('.month-separator').forEach(function(sep) {
         sep.style.display = 'none';
       });
-      // Walk the grid: if a separator is followed (eventually) by a visible card before the next separator, show it
       var grid = document.querySelector('.papers-grid');
       var children = Array.from(grid.children);
       var lastSep = null;
@@ -1345,26 +1344,99 @@
         } else if (el.classList.contains('paper-card')) {
           if (el.getAttribute('data-tab') === tab && lastSep) {
             lastSep.style.display = '';
-            lastSep = null; // only reveal once
+            lastSep = null;
           }
         }
       });
     }
+
     function switchTab(btn) {
       var tab = btn.getAttribute('data-tab');
       document.querySelectorAll('.tab-btn').forEach(function(b) {
         b.classList.toggle('active', b === btn);
       });
       document.querySelectorAll('.paper-card').forEach(function(card) {
-        card.style.display = card.getAttribute('data-tab') === tab ? '' : 'none';
+        var match = card.getAttribute('data-tab') === tab;
+        card.style.display = match ? '' : 'none';
+        if (match) {
+          card.classList.remove('visible');
+          void card.offsetWidth;
+          card.classList.add('visible');
+        }
       });
       updateMonthSeparators(tab);
     }
-    // Show only research tab cards on load
+
     document.querySelectorAll('.paper-card').forEach(function(card) {
       if (card.getAttribute('data-tab') !== 'research') card.style.display = 'none';
     });
     updateMonthSeparators('research');
+
+    /* ---- Navbar scroll effect ---- */
+    var nav = document.querySelector('nav');
+    window.addEventListener('scroll', function() {
+      nav.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+
+    /* ---- Animated stat counters ---- */
+    function animateCounter(el, target, duration) {
+      var start = 0;
+      var startTime = null;
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        var progress = Math.min((timestamp - startTime) / duration, 1);
+        var eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.floor(eased * target);
+        if (progress < 1) requestAnimationFrame(step);
+        else el.textContent = target;
+      }
+      requestAnimationFrame(step);
+    }
+
+    var statsAnimated = false;
+    var statsBar = document.querySelector('.stats-bar');
+    var statsObserver = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting && !statsAnimated) {
+        statsAnimated = true;
+        document.querySelectorAll('.stat-number').forEach(function(el) {
+          var target = parseInt(el.textContent, 10);
+          if (target > 100) {
+            el.textContent = target;
+          } else {
+            el.textContent = '0';
+            animateCounter(el, target, 1200);
+          }
+        });
+      }
+    }, { threshold: 0.5 });
+    if (statsBar) statsObserver.observe(statsBar);
+
+    /* ---- Scroll-reveal for cards and sections ---- */
+    document.querySelectorAll('.paper-card, .section-header, .month-separator, .newsletter-section').forEach(function(el) {
+      el.classList.add('reveal');
+    });
+
+    var revealObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var delay = 0;
+          var el = entry.target;
+          if (el.classList.contains('paper-card')) {
+            var siblings = Array.from(document.querySelectorAll('.paper-card[style=""], .paper-card:not([style])'));
+            var idx = siblings.indexOf(el);
+            delay = Math.max(0, idx % 3) * 80;
+          }
+          setTimeout(function() {
+            el.classList.add('visible');
+          }, delay);
+          revealObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(function(el) {
+      revealObserver.observe(el);
+    });
   </script>
 </body>
 </html>

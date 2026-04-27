@@ -41,6 +41,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -71,7 +72,9 @@ h1, h2, h3, h4 {
 
 /* ---- NAVBAR ---- */
 nav {
-  background-color: var(--white);
+  background-color: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   padding: 0 2rem;
   display: flex;
   align-items: center;
@@ -82,6 +85,11 @@ nav {
   z-index: 100;
   border-bottom: 1px solid var(--border);
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+nav.scrolled {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
 .nav-brand {
@@ -147,9 +155,52 @@ nav {
   overflow: hidden;
 }
 
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(ellipse at 30% 50%, rgba(224, 77, 20, 0.06) 0%, transparent 50%),
+              radial-gradient(ellipse at 70% 50%, rgba(0, 98, 163, 0.05) 0%, transparent 50%);
+  animation: heroShift 12s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes heroShift {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(3%, -2%) scale(1.05); }
+}
+
 .hero-content {
   position: relative;
   z-index: 1;
+}
+
+.hero-content .badge {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: heroFadeUp 0.6s ease forwards 0.1s;
+}
+
+.hero-content h1 {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: heroFadeUp 0.6s ease forwards 0.25s;
+}
+
+.hero-content p {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: heroFadeUp 0.6s ease forwards 0.4s;
+}
+
+@keyframes heroFadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero h1 {
@@ -219,6 +270,11 @@ nav {
   color: var(--blue);
   line-height: 1;
   font-family: Georgia, serif;
+  transition: transform 0.3s ease;
+}
+
+.stat-item:hover .stat-number {
+  transform: scale(1.12);
 }
 
 .stat-label {
@@ -261,11 +317,16 @@ nav {
 }
 
 .divider {
-  width: 36px;
+  width: 0;
   height: 3px;
   background: var(--orange);
   margin: 0.65rem 0 0;
   border-radius: 2px;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+}
+
+.section-header.visible .divider {
+  width: 36px;
 }
 
 /* ---- TABS ---- */
@@ -282,8 +343,13 @@ nav {
   padding: 0.7rem 1.5rem 0.8rem;
   cursor: pointer;
   position: relative;
-  transition: color var(--transition);
+  transition: color 0.3s ease, background 0.3s ease;
   text-align: left;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.tab-btn:hover {
+  background: rgba(0,0,0,0.02);
 }
 
 .tab-btn::after {
@@ -292,10 +358,10 @@ nav {
   bottom: -2px;
   left: 0;
   width: 0;
-  height: 2px;
+  height: 2.5px;
   background: var(--orange);
   border-radius: 2px 2px 0 0;
-  transition: width var(--transition);
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .tab-btn:hover .tab-title {
@@ -362,6 +428,27 @@ nav {
   flex: 1;
   height: 1px;
   background: var(--border);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s;
+}
+
+.month-separator.visible::after {
+  transform: scaleX(1);
+}
+
+/* ---- SCROLL REVEAL ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .paper-card {
@@ -369,7 +456,9 @@ nav {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
-  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.35s ease,
+              border-color 0.25s ease;
   text-decoration: none;
   color: inherit;
   display: flex;
@@ -378,9 +467,18 @@ nav {
 }
 
 .paper-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px);
   box-shadow: var(--shadow-hover);
   border-color: var(--blue);
+}
+
+.paper-card:hover .paper-card-placeholder svg {
+  transform: scale(1.03);
+  transition: transform 0.4s ease;
+}
+
+.paper-card-placeholder svg {
+  transition: transform 0.4s ease;
 }
 
 .paper-card-placeholder {
@@ -451,6 +549,12 @@ nav {
   font-weight: 600;
   letter-spacing: 0.02em;
   font-family: 'Inter', Arial, sans-serif;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.paper-card:hover .tag {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
 .tag.green  { background: #EAF7EE; color: #1A7A40; }
@@ -533,13 +637,14 @@ nav {
   font-size: 0.9rem;
   font-family: inherit;
   cursor: pointer;
-  transition: background var(--transition), transform var(--transition);
+  transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   white-space: nowrap;
 }
 
 .newsletter-form button:hover {
   background: var(--blue-dark);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 98, 163, 0.3);
 }
 
 .newsletter-note {
@@ -851,11 +956,13 @@ footer {
   color: #808080;
   text-decoration: none;
   font-size: 0.84rem;
-  transition: color var(--transition);
+  transition: color 0.3s ease, transform 0.3s ease;
+  display: inline-block;
 }
 
 .footer-links a:hover {
   color: var(--white);
+  transform: translateY(-1px);
 }
 
 footer p a {
@@ -992,4 +1099,13 @@ input:focus-visible {
 @media (max-width: 600px) {
   .tts-player { padding: 1.5rem 1.5rem 0; }
   .tts-player-inner { flex-direction: column; align-items: flex-start; }
+}
+
+/* ---- REDUCED MOTION ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
 }
