@@ -85,19 +85,13 @@
       .author-card { flex-direction: column; gap: 1.25rem; }
     }
     .author-avatar {
-      width: 72px;
-      height: 72px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
-      background: var(--bg-beige);
-      border: 2px solid var(--border-dark);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--orange);
-      font-family: Georgia, serif;
+      border: 3px solid var(--border-dark);
       flex-shrink: 0;
+      object-fit: cover;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     }
     .author-info h3 {
       font-size: 1.15rem;
@@ -231,7 +225,7 @@
     <div class="divider"></div>
 
     <div class="author-card">
-      <div class="author-avatar">SK</div>
+      <img src="assets/images/headshot.png" alt="Satish K C" class="author-avatar"/>
       <div class="author-info">
         <h3>Satish K C</h3>
         <div class="author-meta">Data Scientist &middot; Houston, Texas</div>
