@@ -1350,27 +1350,33 @@
       });
     }
 
-    function switchTab(btn) {
-      var tab = btn.getAttribute('data-tab');
+    function applyTab(tab, animate) {
       document.querySelectorAll('.tab-btn').forEach(function(b) {
-        b.classList.toggle('active', b === btn);
+        b.classList.toggle('active', b.getAttribute('data-tab') === tab);
       });
       document.querySelectorAll('.paper-card').forEach(function(card) {
         var match = card.getAttribute('data-tab') === tab;
         card.style.display = match ? '' : 'none';
-        if (match) {
+        if (match && animate) {
           card.classList.remove('visible');
           void card.offsetWidth;
+          card.classList.add('visible');
+        } else if (match) {
           card.classList.add('visible');
         }
       });
       updateMonthSeparators(tab);
+      try { sessionStorage.setItem('chronicle-tab', tab); } catch(e) {}
     }
 
-    document.querySelectorAll('.paper-card').forEach(function(card) {
-      if (card.getAttribute('data-tab') !== 'research') card.style.display = 'none';
-    });
-    updateMonthSeparators('research');
+    function switchTab(btn) {
+      applyTab(btn.getAttribute('data-tab'), true);
+    }
+
+    var savedTab = null;
+    try { savedTab = sessionStorage.getItem('chronicle-tab'); } catch(e) {}
+    var initialTab = savedTab || 'research';
+    applyTab(initialTab, false);
 
     /* ---- Navbar scroll effect ---- */
     var nav = document.querySelector('nav');
@@ -1412,30 +1418,52 @@
     if (statsBar) statsObserver.observe(statsBar);
 
     /* ---- Scroll-reveal for cards and sections ---- */
-    document.querySelectorAll('.paper-card, .section-header, .month-separator, .newsletter-section').forEach(function(el) {
+    var isBackNav = !!(window.performance && window.performance.navigation && window.performance.navigation.type === 2)
+      || !!(window.performance && window.performance.getEntriesByType && window.performance.getEntriesByType('navigation').length && window.performance.getEntriesByType('navigation')[0].type === 'back_forward');
+
+    document.querySelectorAll('.section-header, .month-separator, .newsletter-section').forEach(function(el) {
       el.classList.add('reveal');
+      if (isBackNav) el.classList.add('visible');
     });
 
-    var revealObserver = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          var delay = 0;
-          var el = entry.target;
-          if (el.classList.contains('paper-card')) {
-            var siblings = Array.from(document.querySelectorAll('.paper-card[style=""], .paper-card:not([style])'));
-            var idx = siblings.indexOf(el);
-            delay = Math.max(0, idx % 3) * 80;
-          }
-          setTimeout(function() {
-            el.classList.add('visible');
-          }, delay);
-          revealObserver.unobserve(el);
-        }
-      });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.paper-card').forEach(function(el) {
+      el.classList.add('reveal');
+      if (isBackNav) el.classList.add('visible');
+    });
 
-    document.querySelectorAll('.reveal').forEach(function(el) {
-      revealObserver.observe(el);
+    if (!isBackNav) {
+      var revealObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            var delay = 0;
+            var el = entry.target;
+            if (el.classList.contains('paper-card')) {
+              var siblings = Array.from(document.querySelectorAll('.paper-card[style=""], .paper-card:not([style])'));
+              var idx = siblings.indexOf(el);
+              delay = Math.max(0, idx % 3) * 80;
+            }
+            setTimeout(function() {
+              el.classList.add('visible');
+            }, delay);
+            revealObserver.unobserve(el);
+          }
+        });
+      }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+      document.querySelectorAll('.reveal').forEach(function(el) {
+        revealObserver.observe(el);
+      });
+    }
+
+    window.addEventListener('pageshow', function(e) {
+      if (e.persisted) {
+        document.querySelectorAll('.reveal').forEach(function(el) {
+          el.classList.add('visible');
+        });
+        var tab = null;
+        try { tab = sessionStorage.getItem('chronicle-tab'); } catch(ex) {}
+        if (tab) applyTab(tab, false);
+      }
     });
   </script>
 </body>
